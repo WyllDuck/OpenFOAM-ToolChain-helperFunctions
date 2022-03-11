@@ -1,70 +1,85 @@
 import thermpy as th
-from scipy.optimize import fsolve
 import numpy as np
+import matplotlib.pyplot as plt
 
-# DECLARE VALUES/PARAMETERS
-# ---- START ----
-Pterm = 25e3
-Pmec = 15e3
-Ac = 2
-h1 = 10
 
-W = 0.7
-t = 0.05
-kb = 0.5
-Tb = 40
+"""
+AUXILIARY FUNCTIONS
+"""
 
-Lf = 0.2
-Df = 0.05
-kf = 380
-TL = 60
-h2 = 150
+# Find Current Stage
+def find_index (time, t_stages):
+    sum_ = 0
+    for i in range(len(t_stages)):
+        sum_ += t_stages[i]
+        if sum_ > time:
+            return i
+    return len(t_stages) - 1
 
-Tinf = 23
-# ---- END ----
 
-# DECLARE EQUATIONS 
-def func(x):
-# ---- START ----
-    
-    # UNKNOWS
-    Tc = x[4]
+"""
+DATA
+"""
 
-    T0 = x[0]
-    qc = x[1]
-    qb = x[2]
-    qe = x[3]
+# Configuration Battery
+s = 7 # series
+p = 2 # parallel
 
-    # EQUATIONS
-    # 1
-    r_cv = th.res.convection(h1, Ac)
-    f1 = (Tc - Tinf) / r_cv - qc
+# Cell Parameters
+cap_cell    = 650e-3            # Capacity Cell [Ah]
+R_int       = 80e-3             # Internal Resistance Cell [ohms]
+V_cell      = (4.2 + 2.75) / 2  # Voltage Cell [V]
 
-    # 2
-    P2 = np.pi * Df
-    Ac2 = np.pi / 4 * pow(Df, 2)
+# Mission Stages
+t_stages    = [0, 88, 26.5, 7, 23.5, 3, 767, 3, 72]     # duration of each stage [sec.]
+t_total     = sum(t_stages)                             # total duration of mission [sec.]
 
-    m2 = th.fins.fin.parameter(h2, kf, P2, Ac2)
-    f2 = th.fins.fixed_tip_temperature.q(m2, h2, kf, Ac2, P2, Lf, TL, T0, Tinf) - qe
+w_stages    = [120, 48, 96, 48, 0, 20, 0, 20, 48]       # consumption in each stage [W]
+w_static    = 27.21                                     # Static Power Consumption [W]
 
-    print(th.fins.fixed_tip_temperature.q(m2, h2, kf, Ac2, P2, Lf, TL, 376.2, Tinf))
 
-    # 3
-    r_b = th.res.wall(t, W * W, kb)
-    f3 = (Tc - Tb) / r_b - qb
-    
-    # 4
-    f4 = (Pterm - Pmec) - (qc + qe + qb)
+"""
+MAIN
+"""
+def main ():
 
-    # 5
-    r_tc = 1e-5 / Ac2
-    f5 = (Tc - T0) / r_tc - qe
+    # Saved Values
+    Q_data = []
+    W_data = []
+    t_data = []
 
-    return [f1, f2, f3, f4, f5]
+    time    = 0
+    dt      = 0.01 # step
 
-# ---- END ----
+    while time < t_total:
+
+        i = find_index(time, t_stages)
+
+        W = w_stages[i] + w_static  # power demand of the system
+        I = W / (V_cell * s)        # intensity demand based on battery voltage
+
+        # Heat Dissipated [W]
+        Q_cell = pow((I / p), 2) * R_int
+        Q_bat = s * p * Q_cell
+
+        # Save Data
+        Q_data.append(Q_bat)
+        W_data.append(W)
+        t_data.append(time)
+
+        time += dt # next step
+
+    plot(Q_data, t_data)
+    plot(W_data, t_data)
+
+
+"""
+PLOT
+"""
+def plot (Q_data, t_data):
+    plt.plot(t_data, Q_data)
+    plt.show()
+
 
 if __name__ == "__main__":
-    root = fsolve(func, [10, 10, 10, 100, 0])
-    print(root)
-    
+    main()
