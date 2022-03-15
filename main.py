@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Others
-from atmosphere import Atmosphere, Cylinder 
+from atmosphere import Cylinder 
 from rocket import Rocket
 from battery import Battery
 
@@ -58,10 +58,12 @@ def main ():
 
 
     """ PLOT """
-    plt.plot(t_data, T_atm_data - 273.15)
-    plt.plot(t_data, T_bat_data - 273.15)
-    plt.plot(t_data, Q_dis_data)
-    plt.plot(t_data, W_dis_data)
+    plt.plot(t_data, T_atm_data - 273.15, label="Temperature Atmosphere [ºC]")
+    plt.plot(t_data, T_bat_data - 273.15, label="Temperature Battery [ºC]")
+    plt.plot(t_data, Q_dis_data, label="Q dissipated [J/sec]")
+    plt.plot(t_data, W_dis_data, label="W Battery [J/sec]")
+
+    plt.legend(loc="upper right")
     plt.show()
 
 

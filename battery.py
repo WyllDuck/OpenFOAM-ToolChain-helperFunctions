@@ -62,7 +62,6 @@ class Battery (object):
         return dTdt
 
 
-
     """ AUXILIARY FUNCTIONS """
     # Find Current Stage
     def find_stage (self, time):
