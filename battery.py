@@ -56,7 +56,7 @@ class Battery (object):
     def get_dT (self, time, Q_conv, Q_rad):
         
         Q_dis, W    = self.get_Q_dis(time)
-        Q_tot       = Q_conv + Q_rad - Q_dis / self.V
+        Q_tot       = Q_conv + Q_rad - Q_dis / self.A
         dTdt        = (- Q_tot / self.k * self.A) * self.alpha / self.V
 
         return dTdt
