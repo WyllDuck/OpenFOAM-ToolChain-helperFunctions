@@ -1,83 +1,67 @@
-import thermpy as th
+# Imports
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-"""
-AUXILIARY FUNCTIONS
-"""
-
-# Find Current Stage
-def find_index (time, t_stages):
-    sum_ = 0
-    for i in range(len(t_stages)):
-        sum_ += t_stages[i]
-        if sum_ > time:
-            return i
-    return len(t_stages) - 1
+# Others
+from atmosphere import Atmosphere, Cylinder 
+from rocket import Rocket
+from battery import Battery
 
 
-"""
-DATA
-"""
-
-# Configuration Battery
-s = 7 # series
-p = 2 # parallel
-
-# Cell Parameters
-cap_cell    = 650e-3            # Capacity Cell [Ah]
-R_int       = 80e-3             # Internal Resistance Cell [ohms]
-V_cell      = (4.2 + 2.75) / 2  # Voltage Cell [V]
-
-# Mission Stages
-t_stages    = [0, 88, 26.5, 7, 23.5, 3, 767, 3, 72]     # duration of each stage [sec.]
-t_total     = sum(t_stages)                             # total duration of mission [sec.]
-
-w_stages    = [120, 48, 96, 48, 0, 20, 0, 20, 48]       # consumption in each stage [W]
-w_static    = 27.21                                     # Static Power Consumption [W]
-
-
-"""
-MAIN
-"""
+""" MAIN """
 def main ():
 
+    # Simulation Objects
+    bat = Battery()
+    rck = Rocket()
+    atm = Cylinder()
+
+    # Temperature Battery on Pre-launch
+    T_bat   = 20 + 273.15   # [K]
+
+    time    = 0             # start     [sec.]
+    step    = 0.1           # dt        [sec.]
+    end     = bat.t_total   # end time  [sec.]
+    i       = 0
+
     # Saved Values
-    Q_data = []
-    W_data = []
-    t_data = []
+    T_atm_data  = np.zeros(int((end-time)/step))
+    T_bat_data  = np.zeros(int((end-time)/step))
+    Q_dis_data  = np.zeros(int((end-time)/step))
+    W_dis_data  = np.zeros(int((end-time)/step))
 
-    time    = 0
-    dt      = 0.01 # step
+    t_data      = np.linspace(time, int(end-step), int((end-time)/step)) # time
 
-    while time < t_total:
+    while time < end: #-step
 
-        i = find_index(time, t_stages)
+        # START HERE
+        alt     = rck.get_altitude(time)
+        T_atm   = atm.get_T(alt)
+        Q, W    = bat.get_Q_dis(time) # dissipated heat, and power consumption
 
-        W = w_stages[i] + w_static  # power demand of the system
-        I = W / (V_cell * s)        # intensity demand based on battery voltage
-
-        # Heat Dissipated [W]
-        Q_cell = pow((I / p), 2) * R_int
-        Q_bat = s * p * Q_cell
+        h_atm   = atm.get_h(alt, 40+273.15) # no data for lower temperatures
+        Q_conv  = h_atm * (T_bat - T_atm) # unit surface
+        Q_rad   = 0 # NOTE: We consider the environment (inside the rocket) at the same temperature. No radiation heat transfer 
+        
+        dTdt = bat.get_dT(time, Q_conv, Q_rad)
+        T_bat = T_bat + dTdt * step
+        # END HERE
 
         # Save Data
-        Q_data.append(Q_bat)
-        W_data.append(W)
-        t_data.append(time)
+        T_atm_data[i] = T_atm
+        T_bat_data[i] = T_bat
+        Q_dis_data[i] = Q
+        W_dis_data[i] = W
 
-        time += dt # next step
-
-    plot(Q_data, t_data)
-    plot(W_data, t_data)
+        time    += step # next step
+        i       += 1
 
 
-"""
-PLOT
-"""
-def plot (Q_data, t_data):
-    plt.plot(t_data, Q_data)
+    """ PLOT """
+    plt.plot(t_data, T_atm_data - 273.15)
+    plt.plot(t_data, T_bat_data - 273.15)
+    plt.plot(t_data, Q_dis_data)
+    plt.plot(t_data, W_dis_data)
     plt.show()
 
 
