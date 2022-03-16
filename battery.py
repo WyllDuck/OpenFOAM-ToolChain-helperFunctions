@@ -56,6 +56,10 @@ class Battery (object):
     def get_dT (self, time, Q_conv, Q_rad):
         
         Q_dis, W    = self.get_Q_dis(time)
+
+        # NOTE: 'Q_dis' represents the heat dissipated by the battery internal resistance.
+        #       by substracting this heat to the convection and radiation looses we can consider its effect.
+        
         Q_tot       = Q_conv + Q_rad - Q_dis / self.A
         dTdt        = (- Q_tot / self.k * self.A) * self.alpha / self.V
 

@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from math import exp
+from scipy import interpolate
 
 
 # ICAO - International Standard Atmosphere
@@ -109,11 +110,36 @@ class Cylinder (Atmosphere):
         self.conv_p = np.array([18, 1e3, 10e3, 43e3, 88.5e3, 11e4, 15e4, 18.5e4, 22e4]) # [Pa]
         self.conv_T = np.array([40, 50, 60, 70, 80, 90, 100]) # [Cº]
         self.conv_T = self.conv_T + 273.15 # [K]
+
+        self.intp = interpolate.interp2d(self.conv_p, self.conv_T, self.conv_h)
+
+    
+    # Plot Data
+    # Reviewed: CORRECT DATA ENTRY! (Félix Martí Valverde - 16/03/2022)
+    def plot_h (self):
+
+        for i in range(self.conv_h.shape[0]):
+            plt.plot(self.conv_p, self.conv_h[i, :], label = "T{} = {}ºC".format(i, self.conv_T[i]-273.15))
+            plt.scatter(self.conv_p, self.conv_h[i, :])
+        
+        plt.legend(loc="upper left")
+        plt.show()
     
 
     # Heat Transfer Coefficient
     # source: http://www.iaeng.org/publication/WCE2010/WCE2010_pp1444-1447.pdf
+
+    # METHOD 1
+    # Reviewed: CORRECT! (Félix Martí Valverde - 16/03/2022)
     def get_h (self, h, T):
+
+        p = self.get_p(h)
+        return self.intp(p, T)
+
+
+    # METHOD 2
+    # Review: ERROR in interpolation, better use scipy tools (METHOD 1)! (Félix Martí Valverde - 16/03/2022)
+    def get_h_2 (self, h, T):
 
         index_p = -1
         index_T = -1
@@ -170,9 +196,9 @@ if __name__ == "__main__":
     atmos   = Atmosphere()
     cyl     = Cylinder()
 
-    T_check = 1
-    P_check = 1
-    D_check = 1
+    T_check = 0
+    P_check = 0
+    D_check = 0
     h_check = 1
 
     # NOTE: Height tested up to 80 km in steps of 100 meters
@@ -210,6 +236,9 @@ if __name__ == "__main__":
 
     """ HEAT TRANSFER COEFFICIENT CHECK """
     if h_check:
+
+        cyl.plot_h()
+
         h = np.zeros(it)
         for i in range(it):
             h[i] = cyl.get_h(i*step, Temp)
