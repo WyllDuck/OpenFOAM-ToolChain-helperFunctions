@@ -16,11 +16,11 @@ class Battery (object):
         self.V_cell      = (4.2 + 2.75) / 2  # Mean Cell Voltage [V]
 
         # Mission Stages
-        self.t_stages    = [0, 88, 26.5, 7, 23.5, 3, 767, 3, 72]    # duration of each stage [sec.]
-        self.t_total     = sum(self.t_stages)                       # total duration of mission [sec.]
+        self.t_stages    = [0, 88, 26.5, 7, 23.5, 3, 767, 3, 72, 0]     # duration of each stage [sec.]
+        self.t_total     = sum(self.t_stages)                           # total duration of mission [sec.]
 
-        self.w_stages    = [120, 48, 96, 48, 0, 20, 0, 20, 48]      # consumption in each stage [W]
-        self.w_static    = 27.21                                    # Static Power Consumption [W]
+        self.w_stages    = [120, 48, 96, 48, 0, 20, 0, 20, 48, 0]       # consumption in each stage [W]
+        self.w_static    = 27.21                                        # Static Power Consumption [W]
 
         # Dimension Battery
         self.a = 8.5e-2 # side a [m]
@@ -34,6 +34,10 @@ class Battery (object):
         # Heat Transfer and Thermal Diffusivity
         self.k = 237            # [W/(m*K)] aluminium
         self.alpha = 97e-6      # [m^2/s] aluminium
+
+        # Battery Capacity
+        self.cap_cell = 650     # [mAh] Cell Capacity
+        self.cap_bat  = self.s * self.p * self.cap_cell * self.V_cell / 1000 # [Wh] Full Battery
 
 
     # Heat Dissipated [W]

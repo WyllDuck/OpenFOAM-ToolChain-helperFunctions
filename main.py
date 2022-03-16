@@ -22,25 +22,39 @@ def main ():
     # Temperature Environment Radiation
     T_env   = 20 + 273.15   # [K]
 
+    # Consumed Power [W]
+    P_bat = 0
+
     time    = 0             # start     [sec.]
     step    = 0.1           # dt        [sec.]
-    end     = bat.t_total   # end time  [sec.]
-    i       = 0
-
-    # Saved Values
-    T_atm_data  = np.zeros(int((end-time)/step))
-    T_bat_data  = np.zeros(int((end-time)/step))
-    Q_dis_data  = np.zeros(int((end-time)/step))
-    W_dis_data  = np.zeros(int((end-time)/step))
-
-    Q_rad_data  = np.zeros(int((end-time)/step))
-    Q_cov_data  = np.zeros(int((end-time)/step))
-
+    
+    # end     = bat.t_total   # end time  [sec.] - For Thermal Simulation
+    end     = 3800          # end time  [sec.] - For Power Consumption Simulation
+    
     t_data      = np.linspace(time, int(end-step), int((end-time)/step)) # time
 
-    while time < end: #-step
+
+    """ HEAT RELEATED SIMULATION """
+    # Saved Values
+    T_atm_data = np.zeros(int((end-time)/step))
+    T_bat_data = np.zeros(int((end-time)/step))
+    Q_dis_data = np.zeros(int((end-time)/step))
+    W_dis_data = np.zeros(int((end-time)/step))
+
+    Q_rad_data = np.zeros(int((end-time)/step))
+    Q_cov_data = np.zeros(int((end-time)/step))
+
+    """ POWER RELEATED SIMULATION """
+    # Saved Values
+    P_bat_data = np.zeros(int((end-time)/step))
+
+
+    for i in range(len(t_data)):
+
+        time = t_data[i]
 
         # START HERE
+        """ HEAT RELEATED SIMULATION """
         alt     = rck.get_altitude(time)
         T_atm   = atm.get_T(alt)
         Q, W    = bat.get_Q_dis(time) # dissipated heat, and power consumption
@@ -54,9 +68,14 @@ def main ():
 
         dTdt = bat.get_dT(time, Q_conv, Q_rad)
         T_bat = T_bat + dTdt * step
+
+        """ POWER RELEATED SIMULATION """
+        P_bat += W * step * (1/3600) # [Wh]
+
         # END HERE
 
         # Save Data
+        """ HEAT RELEATED SIMULATION """
         T_atm_data[i] = T_atm
         T_bat_data[i] = T_bat
         Q_dis_data[i] = Q
@@ -65,8 +84,8 @@ def main ():
         Q_cov_data[i] = Q_conv
         Q_rad_data[i] = Q_rad
 
-        time    += step # next step
-        i       += 1
+        """ POWER RELEATED SIMULATION """
+        P_bat_data[i] = P_bat
 
 
     """ PLOT """
@@ -82,6 +101,12 @@ def main ():
     plt.plot(t_data, Q_cov_data, label="Q convection [J/sec]")
 
     plt.legend(loc="upper right")
+    plt.show()
+
+    plt.plot(t_data, P_bat_data, label="Power Consumed [Wh]")
+    plt.axhline(y=bat.cap_bat, color='red', linestyle='--', label="MAX Battery Capacity [Wh]")
+
+    plt.legend(loc="lower right")
     plt.show()
 
 
