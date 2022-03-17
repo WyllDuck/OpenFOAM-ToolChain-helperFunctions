@@ -23,9 +23,9 @@ class Battery (object):
         self.w_static    = 27.21                                        # Static Power Consumption [W]
 
         # Dimension Battery
-        self.a = 8.5e-2 # side a [m]
-        self.b = 8.5e-2 # side b [m]
-        self.c = 6.5e-2 # side c [m]
+        self.a = 7.5e-2 # side a [m] height extra 1.5 cm (could go up to 2.0 cm)
+        self.b = 8.5e-2 # side b [m] width
+        self.c = 6.0e-2 # side c [m] length
 
         # Surface and Volume
         self.A = self.a * self.b * 2 + self.a * self.c * 2 # + self.b * self.c * 2 # [m^2] b and c can be considered adiabatic
