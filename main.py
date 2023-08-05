@@ -1,113 +1,111 @@
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 # Others
-from atmosphere import Cylinder 
-from rocket import Rocket
-from battery import Battery
+from atmosphere import Atmosphere 
 
 
 """ MAIN """
 def main ():
 
     # Simulation Objects
-    bat = Battery()
-    rck = Rocket()
-    atm = Cylinder()
+    atmos = Atmosphere()
 
-    # Temperature Battery on Pre-launch
-    T_bat   = 20 + 273.15   # [K]
+    # NOTE: Height tested up to 80 km in steps of 100 meters
+    it      = 20000
+    step    = 1
 
-    # Temperature Environment Radiation
-    T_env   = 20 + 273.15   # [K]
+    rho = np.zeros(it)
+    mu  = np.zeros(it)
+    c   = np.zeros(it)
 
-    # Consumed Power [W]
-    P_bat = 0
-
-    time    = 0             # start     [sec.]
-    step    = 0.1           # dt        [sec.]
+    gamma  = 1.4
     
-    # end     = bat.t_total   # end time  [sec.] - For Thermal Simulation
-    end     = 3800          # end time  [sec.] - For Power Consumption Simulation
+    R       = 8.31446261815324 # [J/(mol*K)]
+    M_air   = 0.0289644 # [kg/mol]
+    Rs      = R/M_air
+
+    # fixed values
+    Re  = 9.84e6
+    D   = 1 # Measurements per meter!
+
+    for i in range(it):
+        rho[i] = atmos.get_density_interpolate(i*step)
+        mu[i]  = atmos.get_mu_interpolate(i*step)
+        c[i]   = np.sqrt(gamma*Rs*atmos.get_T_interpolate(i*step))
+
+    # Reynolds Number (Re = rho*U*D/mu)
+    # Re - Reynolds Number
+    # rho - Density
+    # U - Velocity
+    # D - Characteristic Length
+    # mu - Dynamic Viscosity
+
+    U = Re/(rho*D/mu)
+    Ma = U/c
+
+    # PLOT
+    plt.plot(U, np.linspace(0, it*step, it), label="U")
+    plt.plot(c, np.linspace(0, it*step, it), label="c")
     
-    t_data      = np.linspace(time, int(end-step), int((end-time)/step)) # time
-
-
-    """ HEAT RELEATED SIMULATION """
-    # Saved Values
-    T_atm_data = np.zeros(int((end-time)/step))
-    T_bat_data = np.zeros(int((end-time)/step))
-    Q_dis_data = np.zeros(int((end-time)/step))
-    W_dis_data = np.zeros(int((end-time)/step))
-
-    Q_rad_data = np.zeros(int((end-time)/step))
-    Q_cov_data = np.zeros(int((end-time)/step))
-
-    """ POWER RELEATED SIMULATION """
-    # Saved Values
-    P_bat_data = np.zeros(int((end-time)/step))
-
-
-    for i in range(len(t_data)):
-
-        time = t_data[i]
-
-        # START HERE
-        """ HEAT RELEATED SIMULATION """
-        alt     = rck.get_altitude(time)
-        T_atm   = atm.get_T(alt)
-        Q, W    = bat.get_Q_dis(time) # dissipated heat, and power consumption
-
-        h_atm   = atm.get_h(alt, 40+273.15) # no data for lower temperatures
-        Q_conv  = h_atm * (T_bat - T_atm) # unit surface
-        
-        #Q_rad   = 0 # NOTE: We consider the environment (inside the rocket) at the same temperature. No radiation heat transfer 
-        T_env = T_atm # option 1, else const. T_env
-        Q_rad   = 5.67e-8*(pow(T_bat, 4) - pow(T_env, 4)) # NOTE: This is the worst case scenario
-
-        dTdt = bat.get_dT(time, Q_conv, Q_rad)
-        T_bat = T_bat + dTdt * step
-
-        """ POWER RELEATED SIMULATION """
-        P_bat += W * step * (1/3600) # [Wh]
-
-        # END HERE
-
-        # Save Data
-        """ HEAT RELEATED SIMULATION """
-        T_atm_data[i] = T_atm
-        T_bat_data[i] = T_bat
-        Q_dis_data[i] = Q
-        W_dis_data[i] = W
-
-        Q_cov_data[i] = Q_conv
-        Q_rad_data[i] = Q_rad
-
-        """ POWER RELEATED SIMULATION """
-        P_bat_data[i] = P_bat
-
-
-    """ PLOT """
-    plt.plot(t_data, T_atm_data - 273.15, label="Temperature Atmosphere [ºC]")
-    plt.plot(t_data, T_bat_data - 273.15, label="Temperature Battery [ºC]")
-    plt.plot(t_data, Q_dis_data, label="Q dissipated [J/sec]")
-    plt.plot(t_data, W_dis_data, label="W Battery [J/sec]")
-
-    plt.legend(loc="upper right")
+    plt.xlabel("Velocity [m/s]")
+    plt.ylabel("Height [m]")
+    plt.legend()
     plt.show()
 
-    plt.plot(t_data, Q_rad_data, label="Q radiation [J/sec]")
-    plt.plot(t_data, Q_cov_data, label="Q convection [J/sec]")
+    plt.plot(Ma, np.linspace(0, it*step, it), label="Ma")
 
-    plt.legend(loc="upper right")
+    plt.xlabel("Mach Number")
+    plt.ylabel("Height [m]")
+
+    # RASAERO values proposed
+    h_RASAERO   = np.array([1, 25000, 30500, 33000, 37000, 44000, 59000, 63000]) * 0.3048 # Height [m]
+    Ma_RASAERO  = np.array([0.42, 0.9, 1.05, 1.2, 1.5, 2.0, 4.0, 5.0]) # Mach Number
+
+    plt.scatter(Ma_RASAERO, h_RASAERO, label="RASAERO Study Points")
+
+    plt.legend()
+    plt.grid()
     plt.show()
 
-    plt.plot(t_data, P_bat_data, label="Power Consumed [Wh]")
-    plt.axhline(y=bat.cap_bat, color='red', linestyle='--', label="MAX Battery Capacity [Wh]")
 
-    plt.legend(loc="lower right")
+    # Calculate Boundary Conditions for Project Mach Numbers
+    Ma_PROJECT = [0.6, 0.8, 0.9, 0.95, 1.0, 1.2, 1.5, 1.8, 2.3, 2.96, 3.96, 4.63]
+
+    data = np.zeros((len(Ma_PROJECT), 5))
+
+    for i in range(len(Ma_PROJECT)):
+
+        index = np.absolute(Ma - Ma_PROJECT[i]).argmin()
+
+        h = index*step
+        T = atmos.get_T_interpolate(h)
+        p = atmos.get_P_interpolate(h)
+        u = Ma_PROJECT[i] * np.sqrt(gamma*Rs*T)
+
+        data[i, 0] = h
+        data[i, 1] = T
+        data[i, 2] = p
+        data[i, 3] = u
+        data[i, 4] = Ma_PROJECT[i]
+
+    print(data)
+
+    plt.plot(Ma, np.linspace(0, it*step, it), label="Ma")
+    plt.scatter(Ma_PROJECT, data[:, 0], label="PROJETC Study Points")
+
+    plt.xlabel("Mach Number")
+    plt.ylabel("Height [m]")
+
+    plt.legend()
+    plt.grid()
     plt.show()
+
+    # Save Data
+    df = pd.DataFrame(data, columns=["Height [m]", "Temperature [K]", "Pressure [Pa]", "Velocity [m/s]", "Mach Number"])
+    df.to_csv("boundary_conditions.csv", index=False)
 
 
 if __name__ == "__main__":

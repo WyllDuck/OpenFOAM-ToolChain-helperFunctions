@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from math import exp
-from scipy import interpolate
 
 
 # ICAO - International Standard Atmosphere
@@ -22,7 +21,13 @@ class Atmosphere (object):
         # NOTE: positive means temperature decreases with altitude
         self.dT  = [6.5e-3, 0.0e-3, -1.0e-3, -2.8e-3, 0.0e-3, 2.8e-3, 2.0e-3, 0.0e-3] # [K/m] 
 
-
+        self.h_interpolate      = np.array([-1000, 0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 60000, 70000, 80000])  # [m]
+        self.T_interpolate      = np.array([21.5, 15, 8.5, 2, -4.49, -10.98, -17.47, -23.96, -30.45, -36.94, -43.42, -49.9, -56.5, -56.5, -51.6, -46.64, -22.8, -2.5, -26.13, -53.57, -74.51]) + 273.15 # [K]
+        self.P_interpolate      = np.array([11.39, 10.13, 8.988, 7.95, 7.012, 6.166, 5.405, 4.722, 4.111, 3.565, 3.08, 2.65, 1.211, 0.5529, 0.2549, 0.1197, 0.0287, 0.007978, 0.002196, 0.00052, 0.00011]) * 1e4 # [Pa]
+        self.rho_interpolate    = np.array([1.347, 1.225, 1.112, 1.007, 0.9093, 0.8194, 0.7364, 0.6601, 0.59, 0.5258, 0.4671, 0.4135, 0.1948, 0.08891, 0.04008, 0.01841, 0.003996, 0.001027, 0.0003097, 0.00008283, 0.00001846]) # [kg/m3]
+        self.mu_interpolate     = np.array([1.821, 1.789, 1.758, 1.726, 1.694, 1.661, 1.628, 1.595, 1.561, 1.527, 1.493, 1.458, 1.422, 1.422, 1.448, 1.475, 1.601, 1.704, 1.584, 1.438, 1.321]) * 1e-5 # [Ns/m2] 
+    
+    
     # Temparature [K]
     # Reviewed: CORRECT! (Félix Martí Valverde - 14/03/2022)
     def get_T (self, h):
@@ -69,6 +74,20 @@ class Atmosphere (object):
         p = self.get_p(h)
 
         return pow(pow(self.d0, n) / self.p0 * p, 1/n)
+    
+
+    # Interpolated Functions
+    def get_T_interpolate (self, h):
+        return np.interp(h, self.h_interpolate, self.T_interpolate)
+
+    def get_P_interpolate (self, h):
+        return np.interp(h, self.h_interpolate, self.P_interpolate)
+
+    def get_density_interpolate (self, h):    
+        return np.interp(h, self.h_interpolate, self.rho_interpolate)
+
+    def get_mu_interpolate (self, h):
+        return np.interp(h, self.h_interpolate, self.mu_interpolate)
 
 
     """ AUXILIARY FUNCTIONS """
@@ -91,158 +110,86 @@ class Atmosphere (object):
         return pow(1 + self.Rsp / 9.81 * -self.dT[index], -1)
 
 
-class Cylinder (Atmosphere):
-
-    def __init__(self):
-        super().__init__()
-
-        # Heat Transfer Table
-        self.conv_h =  [[0.86, 1.78, 4.35,  7.02,  9.01,  9.73, 10.06, 11.17, 11.93],
-                        [1.70, 3.12, 6.16,  9.27, 11.90, 12.84, 13.72, 14.87, 16.36],
-                        [2.56, 4.14, 7.40, 10.54, 13.36, 14.47, 15.61, 16.72, 17.98],
-                        [3.16, 4.74, 7.99, 11.44, 14.17, 15.62, 16.37, 17.80, 18.85],
-                        [3.47, 5.11, 8.44, 11.70, 14.67, 15.83, 16.59, 18.32, 19.35],
-                        [3.60, 5.30, 8.56, 12.01, 14.95, 16.14, 16.92, 18.47, 19.64],
-                        [3.51, 5.24, 8.52, 11.99, 15.06, 16.16, 17.02, 18.48, 19.80]]
-
-        self.conv_h = np.array(self.conv_h)
-
-        self.conv_p = np.array([18, 1e3, 10e3, 43e3, 88.5e3, 11e4, 15e4, 18.5e4, 22e4]) # [Pa]
-        self.conv_T = np.array([40, 50, 60, 70, 80, 90, 100]) # [Cº]
-        self.conv_T = self.conv_T + 273.15 # [K]
-
-        self.intp = interpolate.interp2d(self.conv_p, self.conv_T, self.conv_h)
-
-    
-    # Plot Data
-    # Reviewed: CORRECT DATA ENTRY! (Félix Martí Valverde - 16/03/2022)
-    def plot_h (self):
-
-        for i in range(self.conv_h.shape[0]):
-            plt.plot(self.conv_p, self.conv_h[i, :], label = "T{} = {}ºC".format(i, self.conv_T[i]-273.15))
-            plt.scatter(self.conv_p, self.conv_h[i, :])
-        
-        plt.legend(loc="upper left")
-        plt.show()
-    
-
-    # Heat Transfer Coefficient
-    # source: http://www.iaeng.org/publication/WCE2010/WCE2010_pp1444-1447.pdf
-
-    # METHOD 1
-    # Reviewed: CORRECT! (Félix Martí Valverde - 16/03/2022)
-    def get_h (self, h, T):
-
-        p = self.get_p(h)
-        return self.intp(p, T)
-
-
-    # METHOD 2
-    # Review: ERROR in interpolation, better use scipy tools (METHOD 1)! (Félix Martí Valverde - 16/03/2022)
-    def get_h_2 (self, h, T):
-
-        index_p = -1
-        index_T = -1
-
-        # Index Temperature
-        for i in range(len(self.conv_T)):
-            if self.conv_T[i] > T:
-                index_T = i
-                break
-        
-        # Index Pressure
-        p = self.get_p(h)
-        for i in range(len(self.conv_p)):
-            if self.conv_p[i] > p:
-                index_p = i
-                break
-        
-        if index_p == -1 or index_T == -1:
-            print("error")
-            return -1
-
-        if index_p == len(self.conv_p)-1 or index_T == len(self.conv_T)-1:
-            print("error")
-            return -1
-
-        # Convection Coefficients (T-p)
-        h11 = self.conv_h[index_T, index_p]
-        h12 = self.conv_h[index_T, index_p+1]
-        h21 = self.conv_h[index_T+1, index_p]
-        h22 = self.conv_h[index_T+1, index_p+1]
-
-        dT = self.conv_T[index_T+1] - self.conv_T[index_T]
-        dp = self.conv_p[index_p+1] - self.conv_p[index_p]
-
-        # P const.
-        dhdT_p1 = (h21 - h11) / dT
-        dhdT_p2 = (h22 - h12) / dT
-
-        # Interpolation
-        h1 = h11 + dhdT_p1 * (T - self.conv_T[index_T])
-        h2 = h12 + dhdT_p2 * (T - self.conv_T[index_T])
-
-        # T const.
-        dhdp = (h2 - h1) / dp
-
-        # Interpolation
-        h_ = h1 + dhdp * (p - self.conv_p[index_p])
-
-        return h_
-
-
 if __name__ == "__main__":
 
     atmos   = Atmosphere()
-    cyl     = Cylinder()
 
-    T_check = 0
-    P_check = 0
-    D_check = 0
-    h_check = 1
+    T_check     = 1
+    P_check     = 1
+    D_check     = 1
+    mu_check    = 1
 
     # NOTE: Height tested up to 80 km in steps of 100 meters
     it      = 800
     step    = 100
 
-    Temp = 26.43 + 273.15
-
     """ TEMPERATURE CHECK """
     if T_check: 
         T = np.zeros(it)
+        T_interpolate = np.zeros(it)
         for i in range(it):
             T[i] = atmos.get_T(i*step)
+            T_interpolate[i] = atmos.get_T_interpolate(i*step)
 
-        plt.plot(T-273.15, np.linspace(0, it*step, it))
+        plt.plot(T-273.15, np.linspace(0, it*step, it), label="T")
+        plt.plot(T_interpolate-273.15, np.linspace(0, it*step, it), label="T_interpolate")
+        
+        plt.title("Temperature")
+        plt.xlabel("Temperature [K]")
+        plt.ylabel("Height [m]")
+        plt.legend()
+        plt.grid()
         plt.show()
 
     """ PRESSURE CHECK """
     if P_check:
         P = np.zeros(it)
+        P_interpolate = np.zeros(it)
         for i in range(it):
             P[i] = atmos.get_p(i*step)
+            P_interpolate[i] = atmos.get_P_interpolate(i*step)
 
-        plt.plot(P, np.linspace(0, it*step, it))
+        plt.plot(P, np.linspace(0, it*step, it), label="P")
+        plt.plot(P_interpolate, np.linspace(0, it*step, it), label="P_interpolate")
+        
+        plt.title("Pressure")
+        plt.xlabel("Pressure [Pa]")
+        plt.ylabel("Height [m]")
+        plt.legend()
+        plt.grid()
         plt.show()
 
     """ DENSITY CHECK """
     if D_check:
         D = np.zeros(it)
+        D_interpolate = np.zeros(it)
         for i in range(it):
             D[i] = atmos.get_density(i*step)
+            D_interpolate[i] = atmos.get_density_interpolate(i*step)
 
-        plt.plot(D, np.linspace(0, it*step, it))
+        plt.plot(D, np.linspace(0, it*step, it), label="D")
+        plt.plot(D_interpolate, np.linspace(0, it*step, it), label="D_interpolate")
+        
+        plt.title("Density")
+        plt.xlabel("Density [kg/m^3]")
+        plt.ylabel("Height [m]")
+        plt.legend()
+        plt.grid()
+        
         plt.show()
 
-    """ HEAT TRANSFER COEFFICIENT CHECK """
-    if h_check:
-
-        cyl.plot_h()
-
-        h = np.zeros(it)
+    """ VISCOSITY CHECK """
+    if mu_check:
+        mu_interpolate = np.zeros(it)
         for i in range(it):
-            h[i] = cyl.get_h(i*step, Temp)
+            mu_interpolate[i] = atmos.get_mu_interpolate(i*step)
 
-        plt.plot(h, np.linspace(0, it*step, it))
-        plt.scatter(h, np.linspace(0, it*step, it))
+        plt.plot(mu_interpolate, np.linspace(0, it*step, it), label="mu_interpolate")
+        
+        plt.title("Viscosity")
+        plt.xlabel("Viscosity [Pa*s]")
+        plt.ylabel("Height [m]")
+        plt.legend()
+        plt.grid()
+        
         plt.show()
