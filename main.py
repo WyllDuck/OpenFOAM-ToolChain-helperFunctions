@@ -74,7 +74,7 @@ def main ():
     # Calculate Boundary Conditions for Project Mach Numbers
     Ma_PROJECT = [0.6, 0.8, 0.9, 0.95, 1.0, 1.2, 1.5, 1.8, 2.3, 2.96, 3.96, 4.63]
 
-    data = np.zeros((len(Ma_PROJECT), 5))
+    data = np.zeros((len(Ma_PROJECT), 6))
 
     for i in range(len(Ma_PROJECT)):
 
@@ -84,12 +84,14 @@ def main ():
         T = atmos.get_T_interpolate(h)
         p = atmos.get_P_interpolate(h)
         u = Ma_PROJECT[i] * np.sqrt(gamma*Rs*T)
+        r = atmos.get_density_interpolate(h)
 
         data[i, 0] = h
         data[i, 1] = T
         data[i, 2] = p
         data[i, 3] = u
         data[i, 4] = Ma_PROJECT[i]
+        data[i, 5] = r
 
     print(data)
 
@@ -104,7 +106,7 @@ def main ():
     plt.show()
 
     # Save Data
-    df = pd.DataFrame(data, columns=["Height [m]", "Temperature [K]", "Pressure [Pa]", "Velocity [m/s]", "Mach Number"])
+    df = pd.DataFrame(data, columns=["Height [m]", "Temperature [K]", "Pressure [Pa]", "Velocity [m/s]", "Mach Number", "Density [kg/m^3]"])
     df.to_csv("boundary_conditions.csv", index=False)
 
 
