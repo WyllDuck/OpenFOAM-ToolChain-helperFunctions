@@ -9,12 +9,18 @@ from pathlib import Path
 
 
 # Selected Regions of Interest
-SELECTED_MESHES     = ["4.5M_13L"]
+SELECTED_MESHES_ADR = "/local/disk1/fvalverde/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
+SELECTED_MESHES     = ["300k_5L", "850k_7L", "1.5M_15L", "3.5M_15L", "4.5M_13L"]
 SELECTED_SOLVERS    = ["rhoPimpleFoam", "rhoCentralFoam", "rhoSimpleFoam"]
 SELECTED_MA         = [0.6, 1.0, 1.5, 2.3, 4.63]
-SELECTED_AOA        = [0, 4, 8, 16]
+SELECTED_AOA        = [0, 8, 16]
 
-# Addresses Files
+CROSS_SECTION_AREAS = {0: 0.001282603306, 8: 0.00436352, 16: 0.00774068}
+
+# Save Directory
+SAVE_DIR = "/local/disk1/fvalverde/openfoam-data/sphereCases/run" # Used to set mapFields addresses
+
+# Addresses Files - For Generation of Config Files
 GLOBAL_DIR          = os.path.abspath(os.path.dirname(sys.argv[0]))
 BNDS_FILE_NAME      = "boundary_conditions.csv"
 CA_WINDTUNNEL_NAME  = "CA_coefficients.csv"
@@ -51,12 +57,14 @@ config = {
     "vanLeer": None,
     "minIter": None,
     "final_Co": None,
-    "nprocessors": [4, 1, 1],
+    "nprocessors": [4, 2, 2],
     "pressure": None,
     "temperature": None,
     "density": None,
-    "Aref": 0.001282603306,
-    "lRef": 1.04013,
+    "Aref": None,
+    "lRef": 0.05715,
+    "coeffs_variation": None,
+    "coeffs_range": None,
     "CofR": [
         0.7286625,
         0,
@@ -122,27 +130,180 @@ def main ():
 
                 config_["solver"] = solver
 
+                # Cross Section Area
+                config_["Aref"] = CROSS_SECTION_AREAS[AoA]
+
                 # rhoCentralFoam Specific
                 if config_["solver"] == "rhoCentralFoam":
-                    config_ = rhoCentralFoam_specific(config_)
 
-                # ------------------------------------------------------------------------
-                # Save file as JSON
-                path = folder_dir + "/config_" + "{}_Ma{}_AoA{}_R{}.json".format(solver, Ma, AoA, 0)
-                with open(path, 'w') as outfile:
-                    json.dump(config_, outfile, indent=2, separators=(',', ': '))
+                    # rhoCentralFoam Specific R0
+                    config_R0 = rhoCentralFoam_specific_R0(copy(config_))
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 0, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R0, path)
+
+
+                    # rhoCentralFoam Specific R1
+                    config_R1 = rhoCentralFoam_specific_R1(copy(config_), mapFields=simulation_name)
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 1, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R1, path)
+
+
+                    # rhoCentralFoam Specific R2
+                    config_R2 = rhoCentralFoam_specific_R2(copy(config_), mapFields=simulation_name)
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 2, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R2, path)
+
+
+                    # rhoCentralFoam Specific R3
+                    config_R3 = rhoCentralFoam_specific_R3(copy(config_), mapFields=simulation_name)
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 3, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R3, path)
+
+
+                    # rhoCentralFoam Specific R4
+                    config_R4 = rhoCentralFoam_specific_R4(copy(config_), mapFields=simulation_name)
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 4, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R4, path)
+
+                
+                # rhoPimpleFoam Specific
+                elif config_["solver"] == "rhoPimpleFoam":
+                    continue
+                    
+                
+                # rhoSimpleFoam Specific
+                elif config_["solver"] == "rhoSimpleFoam":
+                    continue
+
+
+                # Error
+                else:
+                    print("ERROR: Solver not found")
 
     return 0
 
 
-# Solver Specific Configuration Parts
-def rhoCentralFoam_specific (config_):
+###########################
+# rhoCentralFoam Specific #
+###########################
 
-    config_["vanLeer"]  = 250
-    config_["minIter"]  = 550
-    config_["final_Co"] = 0.16
+def rhoCentralFoam_specific_R0 (config_):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[0])
+
+    config_["vanLeer"]  = 2000
+    config_["minIter"]  = 3000
+    config_["final_Co"] = 0.32
+
+    config_["coeffs_variation"] = 1e-3
+    config_["coeffs_range"]     = 1000
+        
+    return config_
+
+
+def rhoCentralFoam_specific_R1 (config_, mapFields=None):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[1])
+
+    config_["vanLeer"]  = 1000
+    config_["minIter"]  = 2000
+    config_["final_Co"] = 0.32
+
+    config_["coeffs_variation"] = 1e-3
+    config_["coeffs_range"]     = 200
+
+    if mapFields:
+        config_["map_file"] = SAVE_DIR + "/" + mapFields
     
     return config_
+
+
+def rhoCentralFoam_specific_R2 (config_, mapFields=None):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[2])
+
+    config_["vanLeer"]  = 800
+    config_["minIter"]  = 1700
+    config_["final_Co"] = 0.32
+
+    config_["coeffs_variation"] = 1e-3
+    config_["coeffs_range"]     = 200
+
+    if mapFields:
+        config_["map_file"] = SAVE_DIR + "/" + mapFields
+    
+    return config_
+
+
+def rhoCentralFoam_specific_R3 (config_, mapFields=None):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[3])
+
+    config_["vanLeer"]  = 400
+    config_["minIter"]  = 1300
+    config_["final_Co"] = 0.32
+
+    config_["coeffs_variation"] = 1e-3
+    config_["coeffs_range"]     = 200
+
+    if mapFields:
+        config_["map_file"] = SAVE_DIR + "/" + mapFields
+    
+    return config_
+
+
+def rhoCentralFoam_specific_R4 (config_, mapFields=None):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[4])
+
+    config_["vanLeer"]  = 400
+    config_["minIter"]  = 1300
+    config_["final_Co"] = 0.32
+
+    config_["coeffs_variation"] = 1e-3
+    config_["coeffs_range"]     = 200
+
+    if mapFields:
+        config_["map_file"] = SAVE_DIR + "/" + mapFields
+    
+    return config_
+
+
+# ------------------------------------------------------------------------
+
+
+# Save JSON File
+def save (config, path):
+    with open(path, 'w') as outfile:
+        json.dump(config, outfile, indent=2, separators=(',', ': '))
+    return 0
+
+
+# ------------------------------------------------------------------------
+# Creates bash script to generate all cases in the folder from the configuration files
+# bash runs as follows: ./template_run.sh <configuration file> <template/solver> <output folder>
+
+# Expected generated bash script:
+# ./template_run.sh config_1.json template1 output_folder
+# ./template_run.sh config_2.json template1 output_folder
+# ./template_run.sh config_3.json template1 output_folder
+# ...
+
+class GenerateFromTemplates ():
+
+    def __init__ (self, config):
+        self.config = config
+
+        return None
+
+
+    def generate (self):
+        return None
 
 
 if __name__ == "__main__":
