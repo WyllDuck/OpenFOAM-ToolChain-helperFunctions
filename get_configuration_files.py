@@ -15,7 +15,7 @@ SELECTED_SOLVERS    = ["rhoPimpleFoam", "rhoCentralFoam", "rhoSimpleFoam"]
 SELECTED_MA         = [0.6, 1.0, 1.5, 2.3, 4.63]
 SELECTED_AOA        = [0, 8, 16]
 
-CROSS_SECTION_AREAS = {0: 0.001282603306, 8: 0.00436352, 16: 0.00774068}
+CROSS_SECTION_AREAS = {0: 0.001282603306, 8: 0.001282603306, 16: 0.001282603306} # {0: 0.001282603306, 8: 0.00436352, 16: 0.00774068}
 
 # Save Directory
 SAVE_DIR = "/local/disk1/fvalverde/openfoam-data/sphereCases/run" # Used to set mapFields addresses
@@ -54,9 +54,6 @@ config = {
         None,
         None
     ],
-    "vanLeer": None,
-    "minIter": None,
-    "final_Co": None,
     "nprocessors": [4, 2, 2],
     "pressure": None,
     "temperature": None,
@@ -173,7 +170,40 @@ def main ():
                 
                 # rhoPimpleFoam Specific
                 elif config_["solver"] == "rhoPimpleFoam":
-                    continue
+                    
+                    # rhoPimpleFoam Specific R0
+                    config_R0 = rhoPimpleFoam_specific_R0(copy(config_))
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 0, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R0, path)
+
+
+                    # rhoPimpleFoam Specific R1
+                    config_R1 = rhoPimpleFoam_specific_R1(copy(config_), mapFields=simulation_name)
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 1, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R1, path)
+
+
+                    # rhoPimpleFoam Specific R2
+                    config_R2 = rhoPimpleFoam_specific_R2(copy(config_), mapFields=simulation_name)
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 2, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R2, path)
+
+
+                    # rhoPimpleFoam Specific R3
+                    config_R3 = rhoPimpleFoam_specific_R3(copy(config_), mapFields=simulation_name)
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 3, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R3, path)
+
+
+                    # rhoPimpleFoam Specific R4
+                    config_R4 = rhoPimpleFoam_specific_R4(copy(config_), mapFields=simulation_name)
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 4, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R4, path)
                     
                 
                 # rhoSimpleFoam Specific
@@ -215,7 +245,7 @@ def rhoCentralFoam_specific_R1 (config_, mapFields=None):
     config_["final_Co"] = 0.32
 
     config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 200
+    config_["coeffs_range"]     = 100
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
@@ -232,7 +262,7 @@ def rhoCentralFoam_specific_R2 (config_, mapFields=None):
     config_["final_Co"] = 0.32
 
     config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 200
+    config_["coeffs_range"]     = 100
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
@@ -249,7 +279,7 @@ def rhoCentralFoam_specific_R3 (config_, mapFields=None):
     config_["final_Co"] = 0.32
 
     config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 200
+    config_["coeffs_range"]     = 100
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
@@ -266,7 +296,7 @@ def rhoCentralFoam_specific_R4 (config_, mapFields=None):
     config_["final_Co"] = 0.32
 
     config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 200
+    config_["coeffs_range"]     = 100
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
@@ -276,7 +306,73 @@ def rhoCentralFoam_specific_R4 (config_, mapFields=None):
 
 # ------------------------------------------------------------------------
 
+##########################
+# rhoPimpleFoam Specific #
+##########################
 
+def rhoPimpleFoam_specific_R0 (config_):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[0])
+
+    config_["coeffs_variation"] = 1e-3
+    config_["coeffs_range"]     = 1000
+
+    return config_
+
+
+def rhoPimpleFoam_specific_R1 (config_, mapFields=None):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[1])
+
+    if mapFields:
+        config_["map_file"] = SAVE_DIR + "/" + mapFields
+
+    config_["coeffs_variation"] = 1e-3
+    config_["coeffs_range"]     = 100
+
+    return config_
+
+
+def rhoPimpleFoam_specific_R2 (config_, mapFields=None):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[2])
+
+    if mapFields:
+        config_["map_file"] = SAVE_DIR + "/" + mapFields
+
+    config_["coeffs_variation"] = 1e-3
+    config_["coeffs_range"]     = 100
+
+    return config_
+
+
+def rhoPimpleFoam_specific_R3 (config_, mapFields=None):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[3])
+
+    if mapFields:
+        config_["map_file"] = SAVE_DIR + "/" + mapFields
+
+    config_["coeffs_variation"] = 1e-3
+    config_["coeffs_range"]     = 100
+
+    return config_
+
+
+def rhoPimpleFoam_specific_R4 (config_, mapFields=None):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[4])
+
+    if mapFields:
+        config_["map_file"] = SAVE_DIR + "/" + mapFields
+
+    config_["coeffs_variation"] = 1e-3
+    config_["coeffs_range"]     = 100
+
+    return config_
+
+
+# ------------------------------------------------------------------------
 # Save JSON File
 def save (config, path):
     with open(path, 'w') as outfile:
