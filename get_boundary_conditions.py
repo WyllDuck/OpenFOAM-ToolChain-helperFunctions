@@ -74,7 +74,7 @@ def main ():
     # Calculate Boundary Conditions for Project Mach Numbers
     Ma_PROJECT = [0.6, 0.8, 0.9, 0.95, 1.0, 1.2, 1.5, 1.8, 2.3, 2.96, 3.96, 4.63]
 
-    data = np.zeros((len(Ma_PROJECT), 6))
+    data = np.zeros((len(Ma_PROJECT), 7))
 
     for i in range(len(Ma_PROJECT)):
 
@@ -105,9 +105,12 @@ def main ():
     plt.grid()
     plt.show()
 
+    Kn = np.array(Ma_PROJECT)/Re * np.sqrt(gamma * np.pi / 2)
+    data[:, 6] = Kn
+
     # Save Data
-    df = pd.DataFrame(data, columns=["Height [m]", "Temperature [K]", "Pressure [Pa]", "Velocity [m/s]", "Mach Number", "Density [kg/m^3]"])
-    df.to_csv("boundary_conditions.csv", index=False)
+    df = pd.DataFrame(data, columns=["Height [m]", "Temperature [K]", "Pressure [Pa]", "Velocity [m/s]", "Mach Number [-]", "Density [kg/m^3]", "Knudsen Number [-]"])
+    df.to_csv("WARR_thermal_simulation/boundary_conditions.csv", index=False)
 
 
 if __name__ == "__main__":
