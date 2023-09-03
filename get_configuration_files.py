@@ -1,7 +1,7 @@
 # Imports
 from math import sin, cos, pi
 import pandas as pd
-from copy import copy
+from copy import deepcopy as copy
 import json
 
 import sys, os
@@ -10,7 +10,7 @@ from pathlib import Path
 
 # Selected Regions of Interest
 SELECTED_MESHES_ADR = "/local/disk1/fvalverde/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
-SELECTED_MESHES     = ["300k_5L", "850k_7L", "1.5M_15L", "3.5M_15L", "4.5M_13L"]
+SELECTED_MESHES     = ["R1", "R2", "R3", "R4", "R5"]
 SELECTED_SOLVERS    = ["rhoPimpleFoam", "rhoCentralFoam", "rhoSimpleFoam"]
 SELECTED_MA         = [0.6, 1.0, 1.5, 2.3, 4.63]
 SELECTED_AOA        = [0, 8, 16]
@@ -101,7 +101,7 @@ def main ():
                 # Create empty configuration file
                 config_ = copy(config)
 
-                bndsMaCase = bnds_file[bnds_file["Mach Number"] == Ma].iloc[0]
+                bndsMaCase = bnds_file[bnds_file["Mach Number [-]"] == Ma].iloc[0]
 
                 # Look up values boundary conditions
                 # Velocity
@@ -133,15 +133,8 @@ def main ():
                 # rhoCentralFoam Specific
                 if config_["solver"] == "rhoCentralFoam":
 
-                    # rhoCentralFoam Specific R0
-                    config_R0 = rhoCentralFoam_specific_R0(copy(config_))
-                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 0, solver)
-                    path = folder_dir + "/config_" + simulation_name + ".json"
-                    save(config_R0, path)
-
-
                     # rhoCentralFoam Specific R1
-                    config_R1 = rhoCentralFoam_specific_R1(copy(config_), mapFields=simulation_name)
+                    config_R1 = rhoCentralFoam_specific_R1(copy(config_))
                     simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 1, solver)
                     path = folder_dir + "/config_" + simulation_name + ".json"
                     save(config_R1, path)
@@ -167,19 +160,19 @@ def main ():
                     path = folder_dir + "/config_" + simulation_name + ".json"
                     save(config_R4, path)
 
+
+                    # rhoCentralFoam Specific R5
+                    config_R5 = rhoCentralFoam_specific_R5(copy(config_), mapFields=simulation_name)
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 5, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R5, path)
+
                 
                 # rhoPimpleFoam Specific
                 elif config_["solver"] == "rhoPimpleFoam":
                     
-                    # rhoPimpleFoam Specific R0
-                    config_R0 = rhoPimpleFoam_specific_R0(copy(config_))
-                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 0, solver)
-                    path = folder_dir + "/config_" + simulation_name + ".json"
-                    save(config_R0, path)
-
-
                     # rhoPimpleFoam Specific R1
-                    config_R1 = rhoPimpleFoam_specific_R1(copy(config_), mapFields=simulation_name)
+                    config_R1 = rhoPimpleFoam_specific_R1(copy(config_))
                     simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 1, solver)
                     path = folder_dir + "/config_" + simulation_name + ".json"
                     save(config_R1, path)
@@ -204,6 +197,13 @@ def main ():
                     simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 4, solver)
                     path = folder_dir + "/config_" + simulation_name + ".json"
                     save(config_R4, path)
+
+
+                    # rhoPimpleFoam Specific R5
+                    config_R5 = rhoPimpleFoam_specific_R5(copy(config_), mapFields=simulation_name)
+                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 5, solver)
+                    path = folder_dir + "/config_" + simulation_name + ".json"
+                    save(config_R5, path)
                     
                 
                 # rhoSimpleFoam Specific
@@ -222,7 +222,7 @@ def main ():
 # rhoCentralFoam Specific #
 ###########################
 
-def rhoCentralFoam_specific_R0 (config_):
+def rhoCentralFoam_specific_R1 (config_):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[0])
 
@@ -236,7 +236,7 @@ def rhoCentralFoam_specific_R0 (config_):
     return config_
 
 
-def rhoCentralFoam_specific_R1 (config_, mapFields=None):
+def rhoCentralFoam_specific_R2 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[1])
 
@@ -253,7 +253,7 @@ def rhoCentralFoam_specific_R1 (config_, mapFields=None):
     return config_
 
 
-def rhoCentralFoam_specific_R2 (config_, mapFields=None):
+def rhoCentralFoam_specific_R3 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[2])
 
@@ -270,7 +270,7 @@ def rhoCentralFoam_specific_R2 (config_, mapFields=None):
     return config_
 
 
-def rhoCentralFoam_specific_R3 (config_, mapFields=None):
+def rhoCentralFoam_specific_R4 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[3])
 
@@ -287,7 +287,7 @@ def rhoCentralFoam_specific_R3 (config_, mapFields=None):
     return config_
 
 
-def rhoCentralFoam_specific_R4 (config_, mapFields=None):
+def rhoCentralFoam_specific_R5 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[4])
 
@@ -310,17 +310,17 @@ def rhoCentralFoam_specific_R4 (config_, mapFields=None):
 # rhoPimpleFoam Specific #
 ##########################
 
-def rhoPimpleFoam_specific_R0 (config_):
+def rhoPimpleFoam_specific_R1 (config_):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[0])
 
     config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 1000
+    config_["coeffs_range"]     = 300
 
     return config_
 
 
-def rhoPimpleFoam_specific_R1 (config_, mapFields=None):
+def rhoPimpleFoam_specific_R2 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[1])
 
@@ -328,12 +328,12 @@ def rhoPimpleFoam_specific_R1 (config_, mapFields=None):
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
     config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 100
+    config_["coeffs_range"]     = 50
 
     return config_
 
 
-def rhoPimpleFoam_specific_R2 (config_, mapFields=None):
+def rhoPimpleFoam_specific_R3 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[2])
 
@@ -341,12 +341,12 @@ def rhoPimpleFoam_specific_R2 (config_, mapFields=None):
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
     config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 100
+    config_["coeffs_range"]     = 50
 
     return config_
 
 
-def rhoPimpleFoam_specific_R3 (config_, mapFields=None):
+def rhoPimpleFoam_specific_R4 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[3])
 
@@ -354,12 +354,12 @@ def rhoPimpleFoam_specific_R3 (config_, mapFields=None):
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
     config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 100
+    config_["coeffs_range"]     = 50
 
     return config_
 
 
-def rhoPimpleFoam_specific_R4 (config_, mapFields=None):
+def rhoPimpleFoam_specific_R5 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[4])
 
@@ -367,7 +367,7 @@ def rhoPimpleFoam_specific_R4 (config_, mapFields=None):
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
     config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 100
+    config_["coeffs_range"]     = 50
 
     return config_
 
