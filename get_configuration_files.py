@@ -15,7 +15,7 @@ SELECTED_SOLVERS    = ["rhoPimpleFoam", "rhoCentralFoam", "rhoSimpleFoam"]
 SELECTED_MA         = [0.6, 1.0, 1.5, 2.3, 4.63]
 SELECTED_AOA        = [0, 8, 16]
 
-GENERATE = {"rhoPimpleFoam": 0, "rhoCentralFoam": 1, "rhoSimpleFoam": 0}
+GENERATE = {"rhoPimpleFoam": 1, "rhoCentralFoam": 1, "rhoSimpleFoam": 0}
 
 CROSS_SECTION_AREAS = {0: 0.001282603306, 8: 0.001282603306, 16: 0.001282603306} # {0: 0.001282603306, 8: 0.00436352, 16: 0.00774068}
 
@@ -56,7 +56,7 @@ config = {
         None,
         None
     ],
-    "nprocessors": [4, 2, 2],
+    "nprocessors": [1, 2, 2],
     "pressure": None,
     "temperature": None,
     "density": None,
@@ -87,6 +87,9 @@ config = {
     "Cd_windTunnel": None,
     "Cl_windTunnel": None,
     "CmPitch_windTunnel": None,
+    "purgeWrite": 5,
+    "turbulentKE": None,
+    "turbulentOmega": None,
 }
 
 
@@ -117,6 +120,9 @@ def main ():
                 config_["pressure"]     = bndsMaCase["Pressure [Pa]"]
                 config_["temperature"]  = bndsMaCase["Temperature [K]"]
                 config_["density"]      = bndsMaCase["Density [kg/m^3]"]
+
+                config_["turbulentKE"]  = bndsMaCase["Turbulent Kinetic Energy [m^2/s^2]"]
+                config_["turbulentOmega"] = bndsMaCase["Turbulent Dissipation Rate [1/s]"]
 
                 # Coefficients Wind Tunnel
                 search = CA_windTunnel_file[CA_windTunnel_file["AoA"] == AoA].iloc[0]

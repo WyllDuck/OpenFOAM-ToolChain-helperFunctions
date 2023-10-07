@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from math import sqrt
+from math import sqrt, pow
 
 # Others
 from atmosphere import Atmosphere 
@@ -12,8 +12,8 @@ from atmosphere import Atmosphere
 def main ():
 
     Uatm = 20
-    Iatm = 0.005
-    eddy_viscosity_ratio = 0.2 # 0.2 - 1.3 for external flows
+    Iatm = 0.008
+    eddy_viscosity_ratio = 0.7 # 0.2 - 1.3 for external flows
 
     # Simulation Objects
     atmos = Atmosphere()
@@ -97,7 +97,7 @@ def main ():
         k = sqrt(3/2) * (Uatm * Iatm) ** 2
 
         # Turbulent Dissipation Rate
-        w = r * k / mu * eddy_viscosity_ratio ** -1
+        w = (r * k / mu) * pow(eddy_viscosity_ratio, -1)
 
         data[i, 0] = h
         data[i, 1] = T
