@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from math import sqrt
 
 # Others
 from atmosphere import Atmosphere 
@@ -9,6 +10,10 @@ from atmosphere import Atmosphere
 
 """ MAIN """
 def main ():
+
+    Uatm = 20
+    Iatm = 0.005
+    eddy_viscosity_ratio = 0.2 # 0.2 - 1.3 for external flows
 
     # Simulation Objects
     atmos = Atmosphere()
@@ -74,7 +79,7 @@ def main ():
     # Calculate Boundary Conditions for Project Mach Numbers
     Ma_PROJECT = [0.6, 0.8, 0.9, 0.95, 1.0, 1.2, 1.5, 1.8, 2.3, 2.96, 3.96, 4.63]
 
-    data = np.zeros((len(Ma_PROJECT), 7))
+    data = np.zeros((len(Ma_PROJECT), 10))
 
     for i in range(len(Ma_PROJECT)):
 
@@ -85,6 +90,14 @@ def main ():
         p = atmos.get_P_interpolate(h)
         u = Ma_PROJECT[i] * np.sqrt(gamma*Rs*T)
         r = atmos.get_density_interpolate(h)
+        mu = atmos.get_mu_interpolate(h)
+
+        # Turbulent Kinetic Energy
+        # Variables: Turbulent Intersity Atmosphere (Iatm), Speed Atmosphere (Uatm)
+        k = sqrt(3/2) * (Uatm * Iatm) ** 2
+
+        # Turbulent Dissipation Rate
+        w = r * k / mu * eddy_viscosity_ratio ** -1
 
         data[i, 0] = h
         data[i, 1] = T
@@ -92,6 +105,10 @@ def main ():
         data[i, 3] = u
         data[i, 4] = Ma_PROJECT[i]
         data[i, 5] = r
+        data[i, 6] = 0 # Knudsen Number
+        data[i, 7] = mu
+        data[i, 8] = k
+        data[i, 9] = w
 
     print(data)
 
@@ -109,8 +126,8 @@ def main ():
     data[:, 6] = Kn
 
     # Save Data
-    df = pd.DataFrame(data, columns=["Height [m]", "Temperature [K]", "Pressure [Pa]", "Velocity [m/s]", "Mach Number [-]", "Density [kg/m^3]", "Knudsen Number [-]"])
-    df.to_csv("WARR_thermal_simulation/boundary_conditions.csv", index=False)
+    df = pd.DataFrame(data, columns=["Height [m]", "Temperature [K]", "Pressure [Pa]", "Velocity [m/s]", "Mach Number [-]", "Density [kg/m^3]", "Knudsen Number [-]", "Dynamic Viscosity [Pa*s]", "Turbulent Kinetic Energy [m^2/s^2]", "Turbulent Dissipation Rate [1/s]"])
+    df.to_csv("boundary_conditions.csv", index=False)
 
 
 if __name__ == "__main__":
