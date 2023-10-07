@@ -90,6 +90,7 @@ config = {
     "purgeWrite": 5,
     "turbulentKE": None,
     "turbulentOmega": None,
+    "wallModelnut": None,
 }
 
 
@@ -240,6 +241,8 @@ def rhoCentralFoam_specific_R1 (config_):
 
     config_["coeffs_variation"] = [1e-3, 1e-3, 1e-2]
     config_["coeffs_range"]     = [300, 300, 300]
+
+    config_["wallModelnut"]     = True
         
     return config_
 
@@ -308,6 +311,8 @@ def rhoCentralFoam_specific_R5 (config_, mapFields=None):
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
+
+    config_["wallModelnut"]     = False
     
     return config_
 
