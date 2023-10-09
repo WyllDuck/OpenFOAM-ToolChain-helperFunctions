@@ -9,7 +9,9 @@ from pathlib import Path
 
 
 # Selected Regions of Interest
-SELECTED_MESHES_ADR = "/local/disk1/fvalverde/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
+#SELECTED_MESHES_ADR = "/local/disk1/fvalverde/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
+SELECTED_MESHES_ADR = "~/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
+
 SELECTED_MESHES     = ["R1", "R2", "R3", "R4", "R5"]
 SELECTED_SOLVERS    = ["rhoPimpleFoam", "rhoCentralFoam", "rhoSimpleFoam"]
 SELECTED_MA         = [0.6, 1.0, 1.5, 2.3, 4.63]
@@ -21,6 +23,7 @@ CROSS_SECTION_AREAS = {0: 0.001282603306, 8: 0.001282603306, 16: 0.001282603306}
 
 # Save Directory
 SAVE_DIR = "/local/disk1/fvalverde/openfoam-data/sphereCases/run" # Used to set mapFields addresses
+SAVE_DIR = "~/openfoam-data/sphereCases/run" # Used to set mapFields addresses
 
 # Addresses Files - For Generation of Config Files
 GLOBAL_DIR          = os.path.abspath(os.path.dirname(sys.argv[0]))
