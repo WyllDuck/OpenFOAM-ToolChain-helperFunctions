@@ -9,8 +9,8 @@ from pathlib import Path
 
 
 # Selected Regions of Interest
-#SELECTED_MESHES_ADR = "/local/disk1/fvalverde/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
-SELECTED_MESHES_ADR = "~/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
+SELECTED_MESHES_ADR = "/local/disk1/fvalverde/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
+#SELECTED_MESHES_ADR = "~/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
 
 SELECTED_MESHES     = ["R1", "R2", "R3", "R4", "R5"]
 SELECTED_SOLVERS    = ["rhoPimpleFoam", "rhoCentralFoam", "rhoSimpleFoam"]
@@ -23,7 +23,7 @@ CROSS_SECTION_AREAS = {0: 0.001282603306, 8: 0.001282603306, 16: 0.001282603306}
 
 # Save Directory
 SAVE_DIR = "/local/disk1/fvalverde/openfoam-data/sphereCases/run" # Used to set mapFields addresses
-SAVE_DIR = "~/openfoam-data/sphereCases/run" # Used to set mapFields addresses
+#SAVE_DIR = "~/openfoam-data/sphereCases/run" # Used to set mapFields addresses
 
 # Addresses Files - For Generation of Config Files
 GLOBAL_DIR          = os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -59,7 +59,7 @@ config = {
         None,
         None
     ],
-    "nprocessors": [1, 2, 2],
+    "nprocessors": [4, 2, 2],
     "pressure": None,
     "temperature": None,
     "density": None,
@@ -310,7 +310,7 @@ def rhoCentralFoam_specific_R5 (config_, mapFields=None):
     config_["final_Co"] = 0.32
 
     config_["coeffs_variation"] = [1e-3, 1e-3, 5e-3]
-    config_["coeffs_range"]     = [50, 50, 50]
+    config_["coeffs_range"]     = [70, 70, 70]
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields

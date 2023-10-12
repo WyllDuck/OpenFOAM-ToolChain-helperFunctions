@@ -6,7 +6,7 @@ import pandas as pd
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-
+import os
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 org = (50, 50)
@@ -15,7 +15,10 @@ color = (255, 0, 0)
 thickness = 2
 
 SIZE = 5
-GLOBAL_DIR = "C:/Users/marti/OneDrive/Documentos/3_university/TUM/semmesterarbeit/coefficients"
+
+# get file path with os
+GLOBAL_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 
 def read_file (file_path):
@@ -79,6 +82,10 @@ if __name__ == "__main__":
 
     allFiles = [f for f in listdir(GLOBAL_DIR + "/points") if isfile(join(GLOBAL_DIR + "/points", f))]
 
+    # if folder "check_images" does not exist, create it
+    if not os.path.exists(GLOBAL_DIR + "/check_images"):
+        os.makedirs(GLOBAL_DIR + "/check_images")
+
     START = -8
     STOP = 24
     STEP = 0.1
@@ -136,6 +143,11 @@ if __name__ == "__main__":
             print("ERROR! Header '{}' does not belong to any group".format(header[i]))
 
     for i in range(len(groups)):
+
+        # force 0 deg to be null (for CN and Cm)
+        if groups[i] != "CA":
+            idx = np.where(data[:,0] == 0)[0][0]
+            data[idx,:] = 0
 
         data_ = data[:,[0] + cols_[i]]
         df = pd.DataFrame(data_)
