@@ -393,6 +393,7 @@ def rhoPimpleFoam_specific_R1 (config_):
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[0])
 
     config_["minIter"] = 4000
+    config_["final_Co"] = 0.4
 
     config_["coeffs_variation"] = [1e-3, 1e-3, 1e-2]
     config_["coeffs_range"]     = [300, 300, 300]
@@ -408,6 +409,7 @@ def rhoPimpleFoam_specific_R2 (config_, mapFields=None):
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[1])
 
     config_["minIter"] = 2000
+    config_["final_Co"] = 0.4
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
@@ -426,6 +428,7 @@ def rhoPimpleFoam_specific_R3 (config_, mapFields=None):
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[2])
 
     config_["minIter"] = 2000
+    config_["final_Co"] = 0.4
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
@@ -444,6 +447,7 @@ def rhoPimpleFoam_specific_R4 (config_, mapFields=None):
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[3])
 
     config_["minIter"] = 2000
+    config_["final_Co"] = 0.4
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
@@ -462,6 +466,7 @@ def rhoPimpleFoam_specific_R5 (config_, mapFields=None):
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[4])
 
     config_["minIter"] = 2000
+    config_["final_Co"] = 0.4
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
