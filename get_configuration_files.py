@@ -9,15 +9,42 @@ from pathlib import Path
 
 
 # Selected Regions of Interest
-SELECTED_MESHES_ADR = "/local/disk1/fvalverde/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
-#SELECTED_MESHES_ADR = "~/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
+#SELECTED_MESHES_ADR = "/local/disk1/fvalverde/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
+SELECTED_MESHES_ADR = "~/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
 
 SELECTED_MESHES     = ["R1", "R2", "R3", "R4", "R5"]
 SELECTED_SOLVERS    = ["rhoPimpleFoam", "rhoCentralFoam", "rhoSimpleFoam"]
 SELECTED_MA         = [0.6, 1.0, 1.5, 2.3, 4.63]
 SELECTED_AOA        = [0, 8, 16]
 
-GENERATE = {"rhoPimpleFoam": 1, "rhoCentralFoam": 1, "rhoSimpleFoam": 0}
+# Select which cases to generate
+GENERATE = {
+    # Solvers
+    "rhoPimpleFoam": 1, 
+    "rhoCentralFoam": 1, 
+    "rhoSimpleFoam": 0, 
+
+    # Meshes
+    "R1": 1,
+    "R2": 0, 
+    "R3": 0, 
+    "R4": 0, 
+    "R5": 1, 
+
+    # Mach Numbers
+    "Ma" : {0.6: 1, 
+            1.0: 1, 
+            1.5: 0, 
+            2.3: 0, 
+            4.63: 1
+    }, 
+
+    # Angles of Attack
+    "AoA": {0: 1, 
+            8: 1, 
+            16: 1
+    }
+}
 
 CROSS_SECTION_AREAS = {0: 0.001282603306, 8: 0.001282603306, 16: 0.001282603306} # {0: 0.001282603306, 8: 0.00436352, 16: 0.00774068}
 
@@ -59,7 +86,7 @@ config = {
         None,
         None
     ],
-    "nprocessors": [4, 2, 2],
+    "nprocessors": [1, 2, 2],
     "pressure": None,
     "temperature": None,
     "density": None,
@@ -94,6 +121,7 @@ config = {
     "turbulentKE": None,
     "turbulentOmega": None,
     "wallModelnut": None,
+    "wallModelk": None,
 }
 
 
@@ -104,8 +132,22 @@ def main ():
     Path(folder_dir).mkdir(parents=True, exist_ok=True)
 
     for solver in SELECTED_SOLVERS:
+
+        # skip if not selected
+        if not GENERATE[solver]:
+            continue
+
         for Ma in SELECTED_MA:
+
+            # skip if not selected
+            if not GENERATE["Ma"][Ma]:
+                continue
+
             for AoA in SELECTED_AOA:
+
+                # skip if not selected
+                if not GENERATE["AoA"][AoA]:
+                    continue
 
                 # Create empty configuration file
                 config_ = copy(config)
@@ -143,83 +185,92 @@ def main ():
                 config_["Aref"] = CROSS_SECTION_AREAS[AoA]
 
                 # rhoCentralFoam Specific
-                if config_["solver"] == "rhoCentralFoam" and GENERATE[config_["solver"]]:
+                if config_["solver"] == "rhoCentralFoam":
 
                     # rhoCentralFoam Specific R1
-                    config_R1 = rhoCentralFoam_specific_R1(copy(config_))
-                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 1, solver)
-                    path = folder_dir + "/config_" + simulation_name + ".json"
-                    save(config_R1, path)
+                    if GENERATE["R1"]:
+                        config_R1 = rhoCentralFoam_specific_R1(copy(config_))
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 1, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R1, path)
+
+                    # rhoCentralFoam Specific R2
+                    if GENERATE["R2"]:
+                        config_R2 = rhoCentralFoam_specific_R2(copy(config_), mapFields=simulation_name)
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 2, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R2, path)
 
 
-                    # # rhoCentralFoam Specific R2
-                    # config_R2 = rhoCentralFoam_specific_R2(copy(config_), mapFields=simulation_name)
-                    # simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 2, solver)
-                    # path = folder_dir + "/config_" + simulation_name + ".json"
-                    # save(config_R2, path)
+                    # rhoCentralFoam Specific R3
+                    if GENERATE["R3"]:
+                        config_R3 = rhoCentralFoam_specific_R3(copy(config_), mapFields=simulation_name)
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 3, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R3, path)
 
 
-                    # # rhoCentralFoam Specific R3
-                    # config_R3 = rhoCentralFoam_specific_R3(copy(config_), mapFields=simulation_name)
-                    # simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 3, solver)
-                    # path = folder_dir + "/config_" + simulation_name + ".json"
-                    # save(config_R3, path)
-
-
-                    # # rhoCentralFoam Specific R4
-                    # config_R4 = rhoCentralFoam_specific_R4(copy(config_), mapFields=simulation_name)
-                    # simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 4, solver)
-                    # path = folder_dir + "/config_" + simulation_name + ".json"
-                    # save(config_R4, path)
+                    # rhoCentralFoam Specific R4
+                    if GENERATE["R4"]:
+                        config_R4 = rhoCentralFoam_specific_R4(copy(config_), mapFields=simulation_name)
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 4, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R4, path)
 
 
                     # rhoCentralFoam Specific R5
-                    config_R5 = rhoCentralFoam_specific_R5(copy(config_), mapFields=simulation_name)
-                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 5, solver)
-                    path = folder_dir + "/config_" + simulation_name + ".json"
-                    save(config_R5, path)
+                    if GENERATE["R5"]:
+                        config_R5 = rhoCentralFoam_specific_R5(copy(config_), mapFields=simulation_name)
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 5, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R5, path)
 
                 
                 # rhoPimpleFoam Specific
-                elif config_["solver"] == "rhoPimpleFoam" and GENERATE[config_["solver"]]:
+                elif config_["solver"] == "rhoPimpleFoam":
                     
                     # rhoPimpleFoam Specific R1
-                    config_R1 = rhoPimpleFoam_specific_R1(copy(config_))
-                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 1, solver)
-                    path = folder_dir + "/config_" + simulation_name + ".json"
-                    save(config_R1, path)
+                    if GENERATE["R1"]:
+                        config_R1 = rhoPimpleFoam_specific_R1(copy(config_))
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 1, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R1, path)
 
 
-                    # # rhoPimpleFoam Specific R2
-                    # config_R2 = rhoPimpleFoam_specific_R2(copy(config_), mapFields=simulation_name)
-                    # simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 2, solver)
-                    # path = folder_dir + "/config_" + simulation_name + ".json"
-                    # save(config_R2, path)
+                    # rhoPimpleFoam Specific R2
+                    if GENERATE["R2"]:
+                        config_R2 = rhoPimpleFoam_specific_R2(copy(config_), mapFields=simulation_name)
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 2, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R2, path)
 
 
-                    # # rhoPimpleFoam Specific R3
-                    # config_R3 = rhoPimpleFoam_specific_R3(copy(config_), mapFields=simulation_name)
-                    # simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 3, solver)
-                    # path = folder_dir + "/config_" + simulation_name + ".json"
-                    # save(config_R3, path)
+                    # rhoPimpleFoam Specific R3
+                    if GENERATE["R3"]:
+                        config_R3 = rhoPimpleFoam_specific_R3(copy(config_), mapFields=simulation_name)
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 3, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R3, path)
 
 
-                    # # rhoPimpleFoam Specific R4
-                    # config_R4 = rhoPimpleFoam_specific_R4(copy(config_), mapFields=simulation_name)
-                    # simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 4, solver)
-                    # path = folder_dir + "/config_" + simulation_name + ".json"
-                    # save(config_R4, path)
+                    # rhoPimpleFoam Specific R4
+                    if GENERATE["R4"]:
+                        config_R4 = rhoPimpleFoam_specific_R4(copy(config_), mapFields=simulation_name)
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 4, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R4, path)
 
 
                     # rhoPimpleFoam Specific R5
-                    config_R5 = rhoPimpleFoam_specific_R5(copy(config_), mapFields=simulation_name)
-                    simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 5, solver)
-                    path = folder_dir + "/config_" + simulation_name + ".json"
-                    save(config_R5, path)
+                    if GENERATE["R5"]:
+                        config_R5 = rhoPimpleFoam_specific_R5(copy(config_), mapFields=simulation_name)
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 5, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R5, path)
                     
                 
                 # rhoSimpleFoam Specific
-                elif config_["solver"] == "rhoSimpleFoam" and GENERATE[config_["solver"]]:
+                elif config_["solver"] == "rhoSimpleFoam":
                     continue
 
 
@@ -246,6 +297,7 @@ def rhoCentralFoam_specific_R1 (config_):
     config_["coeffs_range"]     = [300, 300, 300]
 
     config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
         
     return config_
 
@@ -263,6 +315,9 @@ def rhoCentralFoam_specific_R2 (config_, mapFields=None):
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
+        
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
     
     return config_
 
@@ -280,6 +335,9 @@ def rhoCentralFoam_specific_R3 (config_, mapFields=None):
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
+
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
     
     return config_
 
@@ -297,6 +355,9 @@ def rhoCentralFoam_specific_R4 (config_, mapFields=None):
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
+        
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
     
     return config_
 
@@ -315,7 +376,8 @@ def rhoCentralFoam_specific_R5 (config_, mapFields=None):
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
-    config_["wallModelnut"]     = False
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
     
     return config_
 
@@ -330,8 +392,13 @@ def rhoPimpleFoam_specific_R1 (config_):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[0])
 
+    config_["minIter"] = 4000
+
     config_["coeffs_variation"] = [1e-3, 1e-3, 1e-2]
     config_["coeffs_range"]     = [300, 300, 300]
+
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
 
     return config_
 
@@ -340,11 +407,16 @@ def rhoPimpleFoam_specific_R2 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[1])
 
+    config_["minIter"] = 2000
+
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
     config_["coeffs_variation"] = 1e-3
     config_["coeffs_range"]     = 50
+
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
 
     return config_
 
@@ -353,11 +425,16 @@ def rhoPimpleFoam_specific_R3 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[2])
 
+    config_["minIter"] = 2000
+
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
     config_["coeffs_variation"] = 1e-3
     config_["coeffs_range"]     = 50
+    
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
 
     return config_
 
@@ -366,11 +443,16 @@ def rhoPimpleFoam_specific_R4 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[3])
 
+    config_["minIter"] = 2000
+
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
     config_["coeffs_variation"] = 1e-3
     config_["coeffs_range"]     = 50
+    
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
 
     return config_
 
@@ -379,11 +461,16 @@ def rhoPimpleFoam_specific_R5 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[4])
 
+    config_["minIter"] = 2000
+
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
     config_["coeffs_variation"] = [1e-3, 1e-3, 5e-3]
     config_["coeffs_range"]     = [50, 50, 50]
+    
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
 
     return config_
 
@@ -393,29 +480,8 @@ def rhoPimpleFoam_specific_R5 (config_, mapFields=None):
 def save (config, path):
     with open(path, 'w') as outfile:
         json.dump(config, outfile, indent=2, separators=(',', ': '))
+    print("File saved in: {}".format(path))
     return 0
-
-
-# ------------------------------------------------------------------------
-# Creates bash script to generate all cases in the folder from the configuration files
-# bash runs as follows: ./template_run.sh <configuration file> <template/solver> <output folder>
-
-# Expected generated bash script:
-# ./template_run.sh config_1.json template1 output_folder
-# ./template_run.sh config_2.json template1 output_folder
-# ./template_run.sh config_3.json template1 output_folder
-# ...
-
-class GenerateFromTemplates ():
-
-    def __init__ (self, config):
-        self.config = config
-
-        return None
-
-
-    def generate (self):
-        return None
 
 
 if __name__ == "__main__":
