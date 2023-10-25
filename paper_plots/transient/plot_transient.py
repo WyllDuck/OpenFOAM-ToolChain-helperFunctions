@@ -124,14 +124,17 @@ def style_plot(fig, axs):
     max_ = max([axs[0][0].get_ylim()[1], axs[0][1].get_ylim()[1]])
     min_ = min([axs[0][0].get_ylim()[0], axs[0][1].get_ylim()[0]])
     axs[0][0].set_ylim([min_, max_])
+    axs[0][1].set_ylim([min_, max_])
 
     max_ = max([axs[1][0].get_ylim()[1], axs[1][1].get_ylim()[1]])
     min_ = min([axs[1][0].get_ylim()[0], axs[1][1].get_ylim()[0]])
     axs[1][0].set_ylim([min_, max_])
+    axs[1][1].set_ylim([min_, max_])
 
     max_ = max([axs[2][0].get_ylim()[1], axs[2][1].get_ylim()[1]])
     min_ = min([axs[2][0].get_ylim()[0], axs[2][1].get_ylim()[0]])
     axs[2][0].set_ylim([min_, max_])
+    axs[2][1].set_ylim([min_, max_])
 
     # remove y axis numbers right plots
     axs[0][1].set_yticklabels([])
@@ -160,14 +163,21 @@ def style_plot(fig, axs):
     axs[2][1].grid()
 
     # set sub titles
-    axs[0][0].set_title("Entire Simulated Time - Range: {:.2f} - {:.2f} ms".format(CONFIG.MIN_TIME, CONFIG.MAX_TIME), fontsize=16)
-    axs[0][1].set_title("Zoomed in - Range: {:.2f} - {:.2f} ms".format(CONFIG2.MIN_TIME, CONFIG2.MAX_TIME), fontsize=16)
+    axs[0][0].set_title("Entire Simulated Time - Range: {:.2f} - {:.2f} ms".format(CONFIG.MIN_TIME, CONFIG.MAX_TIME), fontsize=14)
+    axs[0][1].set_title("Zoomed in - Range: {:.2f} - {:.2f} ms".format(CONFIG2.MIN_TIME, CONFIG2.MAX_TIME), fontsize=14)
 
     # make legend and axis labels font bigger
     for ax in axs.flat:
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.legend(fontsize=8)
 
+    # add legend to plot above figure 
+    handles, labels = axs[0][0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=4, fontsize=12)
+
+    # make legend invisible in all plots
+    for ax in axs.flat:
+        ax.legend().set_visible(False)
 
 if __name__ == "__main__":
     main()

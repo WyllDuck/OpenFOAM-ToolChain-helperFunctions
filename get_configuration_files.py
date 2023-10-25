@@ -9,10 +9,10 @@ from pathlib import Path
 
 
 # Selected Regions of Interest
-#SELECTED_MESHES_ADR = "/local/disk1/fvalverde/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
-SELECTED_MESHES_ADR = "~/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
+SELECTED_MESHES_ADR = "/local/disk1/fvalverde/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
+#SELECTED_MESHES_ADR = "~/openfoam-data/sphereCases/rocketMesh/rocketShort/noFinSupport/{}/constant/polyMesh"
 
-SELECTED_MESHES     = ["R1", "R2", "R3", "R4", "R5"]
+SELECTED_MESHES     = ["R1", "R2", "R3", "R4", "R5", "R6"]
 SELECTED_SOLVERS    = ["rhoPimpleFoam", "rhoCentralFoam", "rhoSimpleFoam"]
 SELECTED_MA         = [0.6, 1.0, 1.5, 2.3, 4.63]
 SELECTED_AOA        = [0, 8, 16]
@@ -30,12 +30,13 @@ GENERATE = {
     "R3": 0, 
     "R4": 0, 
     "R5": 1, 
+    "R6": 1, 
 
     # Mach Numbers
     "Ma" : {0.6: 1, 
             1.0: 1, 
-            1.5: 0, 
-            2.3: 0, 
+            1.5: 1, 
+            2.3: 1, 
             4.63: 1
     }, 
 
@@ -86,7 +87,7 @@ config = {
         None,
         None
     ],
-    "nprocessors": [1, 2, 2],
+    "nprocessors": [4, 2, 2],
     "pressure": None,
     "temperature": None,
     "density": None,
@@ -117,7 +118,7 @@ config = {
     "Cd_windTunnel": None,
     "Cl_windTunnel": None,
     "CmPitch_windTunnel": None,
-    "purgeWrite": 5,
+    "purgeWrite": 2,
     "turbulentKE": None,
     "turbulentOmega": None,
     "wallModelnut": None,
@@ -225,6 +226,14 @@ def main ():
                         path = folder_dir + "/config_" + simulation_name + ".json"
                         save(config_R5, path)
 
+
+                    # rhoCentralFoam Specific R6
+                    if GENERATE["R6"]:
+                        config_R6 = rhoCentralFoam_specific_R6(copy(config_), mapFields=simulation_name)
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 6, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R6, path)
+
                 
                 # rhoPimpleFoam Specific
                 elif config_["solver"] == "rhoPimpleFoam":
@@ -267,6 +276,14 @@ def main ():
                         simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 5, solver)
                         path = folder_dir + "/config_" + simulation_name + ".json"
                         save(config_R5, path)
+
+
+                    # rhoPimpleFoam Specific R6
+                    if GENERATE["R6"]:
+                        config_R6 = rhoPimpleFoam_specific_R6(copy(config_), mapFields=simulation_name)
+                        simulation_name = "Ma{}_AoA{}_R{}_{}".format(Ma, AoA, 6, solver)
+                        path = folder_dir + "/config_" + simulation_name + ".json"
+                        save(config_R6, path)
                     
                 
                 # rhoSimpleFoam Specific
@@ -382,6 +399,26 @@ def rhoCentralFoam_specific_R5 (config_, mapFields=None):
     return config_
 
 
+def rhoCentralFoam_specific_R6 (config_, mapFields=None):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[5])
+
+    config_["vanLeer"]  = 400
+    config_["minIter"]  = 1300
+    config_["final_Co"] = 0.32
+
+    config_["coeffs_variation"] = [1e-3, 1e-3, 5e-3]
+    config_["coeffs_range"]     = [70, 70, 70]
+
+    if mapFields:
+        config_["map_file"] = SAVE_DIR + "/" + mapFields
+
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
+    
+    return config_
+
+
 # ------------------------------------------------------------------------
 
 ##########################
@@ -465,7 +502,7 @@ def rhoPimpleFoam_specific_R5 (config_, mapFields=None):
 
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[4])
 
-    config_["minIter"] = 2000
+    config_["minIter"] = 1000
     config_["final_Co"] = 0.4
 
     if mapFields:
@@ -479,6 +516,24 @@ def rhoPimpleFoam_specific_R5 (config_, mapFields=None):
 
     return config_
 
+
+def rhoPimpleFoam_specific_R6 (config_, mapFields=None):
+
+    config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[5])
+
+    config_["minIter"] = 1000
+    config_["final_Co"] = 0.4
+
+    if mapFields:
+        config_["map_file"] = SAVE_DIR + "/" + mapFields
+
+    config_["coeffs_variation"] = [1e-3, 1e-3, 5e-3]
+    config_["coeffs_range"]     = [50, 50, 50]
+    
+    config_["wallModelnut"]     = True
+    config_["wallModelk"]       = True
+
+    return config_
 
 # ------------------------------------------------------------------------
 # Save JSON File

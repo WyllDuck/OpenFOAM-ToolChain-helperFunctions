@@ -68,8 +68,8 @@ def main():
     # group 2 colors (list of tuples) --> None element, blue, dark-green
     # groups of colors: 
 
-    color_group_1 = [(0, 0, 0), (1, 0.5, 0), (1, 0, 0)]
-    color_group_2 = [(0, 0, 0), (0, 0, 1), (0, 0.5, 0)]
+    color_group_1 = [(0, 0, 0), (1, 0, 0), (0, 0, 1)]
+    color_group_2 = [(0, 0, 0), (1, 0, 0), (0, 0, 1)]
 
     for AoA in (0, 8, 16):
         c_ = color_group_1[AoA//8]
@@ -79,13 +79,13 @@ def main():
         # plot scatter with different shades of red for different AoA values
         if AoA == 0:
             axs2[0].scatter(data[:,0], data[:,2], label="PIMPLE", marker="o", color=(1, 0, 0))
-            axs2[0].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='dashed')
+            axs2[0].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='-')
         elif AoA == 8:
             axs2[1].scatter(data[:,0], data[:,2], label="PIMPLE", marker="o", color=(1, 0, 0))
-            axs2[1].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='dashed')
+            axs2[1].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='-')
         elif AoA == 16:
             axs2[2].scatter(data[:,0], data[:,2], label="PIMPLE", marker="o", color=(1, 0, 0))
-            axs2[2].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='dashed')
+            axs2[2].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='-')
         else: 
             print("ERROR! AoA value not found")
 
@@ -97,8 +97,8 @@ def main():
 
         # add lines
         c_ = tuple(list(c_) + [ALPHA])
-        axs1[0].plot(data[:,0], data[:,3], color=c_)
-        axs1[1].plot(data[:,0], data[:,4], color=c_)
+        axs1[0].plot(data[:,0], data[:,3], color=c_, linestyle='-')
+        axs1[1].plot(data[:,0], data[:,4], color=c_, linestyle='-')
 
     solver = "CENTRAL"
     res_CENTRAL = df_res[df_res['SOLVER'] == solver].to_numpy()
@@ -111,13 +111,13 @@ def main():
         # plot scatter with different shades of red for different AoA values
         if AoA == 0:
             axs2[0].scatter(data[:,0], data[:,2], label="CENTRAL", marker="x", color=(0, 0, 1))
-            axs2[0].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='dotted')
+            axs2[0].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='-')
         elif AoA == 8:
             axs2[1].scatter(data[:,0], data[:,2], label="CENTRAL", marker="x", color=(0, 0, 1))
-            axs2[1].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='dotted')
+            axs2[1].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='-')
         elif AoA == 16:
             axs2[2].scatter(data[:,0], data[:,2], label="CENTRAL", marker="x", color=(0, 0, 1))
-            axs2[2].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='dotted')
+            axs2[2].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='-')
         else: 
             print("ERROR! AoA value not found")
 
@@ -130,8 +130,8 @@ def main():
         
         # add lines
         c_ = tuple(list(c_) + [ALPHA])
-        axs1[0].plot(data[:,0], data[:,3], color=c_)
-        axs1[1].plot(data[:,0], data[:,4], color=c_)
+        axs1[0].plot(data[:,0], data[:,3], color=c_, linestyle='-')
+        axs1[1].plot(data[:,0], data[:,4], color=c_, linestyle='-')
 
     plot_TUN_data(axs1,axs2)
     
@@ -149,18 +149,15 @@ def main():
 def style_plot_axs1(fig, axs):
 
     # set tittle all subplots
-    fig.suptitle("Aerodynamic Lift and Pitching Moment Coefficients vs. Wind Tunnel Data", fontsize=16)
+    # fig.suptitle("Aerodynamic Lift and Pitching Moment Coefficients vs. Wind Tunnel Data", fontsize=16)
 
     # set axis labels
-    axs[0].set_ylabel('CN', fontsize=12)
-    axs[1].set_ylabel('CmPitch', fontsize=12)
+    axs[0].set_ylabel('CN [-]', fontsize=12)
+    axs[1].set_ylabel('CmPitch [-]', fontsize=12)
 
     # set axis labels x
     axs[0].set_xlabel('Mach Number [-]', fontsize=12)
     axs[1].set_xlabel('Mach Number [-]', fontsize=12)
-
-    # set legend
-    axs[0].legend()
 
     # set grid
     axs[0].grid()
@@ -175,13 +172,30 @@ def style_plot_axs1(fig, axs):
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.legend(fontsize=8)
 
+    # turn off legend axis 1
+    axs[0].legend().set_visible(False)
+    axs[1].legend().set_visible(False)
+
+    # remove repeated legend labels
+    handles, labels = axs[0].get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    
+    # Set WIND TUNNEL DATA label to be the last label
+    by_label["Wind Tunnel Data Points"] = by_label.pop("Wind Tunnel Data Points")
+
+    # add legend above figure - axis 1 and 2 - max column 2 elements
+    fig.legend(by_label.values(), by_label.keys(), loc='lower center', ncol=4, fontsize=12)
+
+    # give more space between legend and plot
+    fig.subplots_adjust(bottom=0.235)
+    
     return
 
 
 def style_plot_axs2(fig, axs):
 
     # set tittle all subplots
-    fig.suptitle("Aerodynamic Drag Coefficients vs. Wind Tunnel Data", fontsize=16)
+    # fig.suptitle("Aerodynamic Drag Coefficients vs. Wind Tunnel Data", fontsize=16)
 
     # subtitle axis
     axs[0].set_title("AoA = 0°", fontsize=12)
@@ -189,17 +203,24 @@ def style_plot_axs2(fig, axs):
     axs[2].set_title("AoA = 16°", fontsize=12)
 
     # set axis labels
-    axs[0].set_ylabel('CA', fontsize=12)
-    axs[1].set_ylabel('CA', fontsize=12)
-    axs[2].set_ylabel('CA', fontsize=12)
+    axs[0].set_ylabel('CA [-]', fontsize=12)
+
+    # remove y axis label for axis 1 and 2
+    axs[1].set_ylabel('')
+    axs[2].set_ylabel('')
+
+    # remove numbers y label for axis 1 and 2
+    axs[1].set_yticklabels([])
+    axs[2].set_yticklabels([])
+
+    # make space between subplots smaller
+    fig.subplots_adjust(wspace=0.05)
+
 
     # set axis labels x
     axs[0].set_xlabel('Mach Number [-]', fontsize=12)
     axs[1].set_xlabel('Mach Number [-]', fontsize=12)
     axs[2].set_xlabel('Mach Number [-]', fontsize=12)
-
-    # set legend - right corner
-    axs[0].legend(loc='upper right')
 
     # set grid
     axs[0].grid()
@@ -220,6 +241,21 @@ def style_plot_axs2(fig, axs):
     for ax in axs.flat:
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.legend(fontsize=8)
+
+    # legend invisible in all plots
+    axs[0].legend().set_visible(False)
+    axs[1].legend().set_visible(False)
+    axs[2].legend().set_visible(False)
+
+    # remove repeated legend labels
+    handles, labels = axs[0].get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+
+    # add legend above figure - axis 1 2 3
+    fig.legend(by_label.values(), by_label.keys(), loc='lower center', ncol=4, fontsize=12)
+
+    # give more space between legend and plot
+    fig.subplots_adjust(bottom=0.2)
 
     return
 
@@ -249,16 +285,16 @@ def plot_TUN_data (axs1, axs2):
         spl_Cm = make_interp_spline(data_TUN_Cm[:,0], data_TUN_Cm[:,1], k=2)
 
         if AoA == 0:
-            axs2[0].plot(xnew, spl_CA(xnew), linestyle='dashed', label="Wind Tunnel Data")
-            axs2[0].scatter(data_TUN_CA[:,0], data_TUN_CA[:,1], s=7, color=(0, 0, 0, 0.65))
+            axs2[0].plot(xnew, spl_CA(xnew), linestyle='dashed', label="Spline Line Interpolation")
+            axs2[0].scatter(data_TUN_CA[:,0], data_TUN_CA[:,1], s=7, color=(0, 0, 0, 0.65), label="Wind Tunnel Data Points")
 
         elif AoA == 8:
-            axs2[1].plot(xnew, spl_CA(xnew), linestyle='dashed', label="Wind Tunnel Data")
-            axs2[1].scatter(data_TUN_CA[:,0], data_TUN_CA[:,1], s=7, color=(0, 0, 0, 0.65))
+            axs2[1].plot(xnew, spl_CA(xnew), linestyle='dashed', label="Spline Line Interpolation")
+            axs2[1].scatter(data_TUN_CA[:,0], data_TUN_CA[:,1], s=7, color=(0, 0, 0, 0.65), label="Wind Tunnel Data Points")
 
         elif AoA == 16:
-            axs2[2].plot(xnew, spl_CA(xnew), linestyle='dashed', label="Wind Tunnel Data")
-            axs2[2].scatter(data_TUN_CA[:,0], data_TUN_CA[:,1], s=7, color=(0, 0, 0, 0.65))
+            axs2[2].plot(xnew, spl_CA(xnew), linestyle='dashed', label="Spline Line Interpolation")
+            axs2[2].scatter(data_TUN_CA[:,0], data_TUN_CA[:,1], s=7, color=(0, 0, 0, 0.65), label="Wind Tunnel Data Points")
 
         else:
             print("ERROR! AoA value not found")
@@ -268,19 +304,19 @@ def plot_TUN_data (axs1, axs2):
 
         elif AoA == 8: 
             # plot dashed black line 
-            axs1[0].plot(xnew, spl_CN(xnew), linestyle='dashed', color=(0, 0, 0), label="Wind Tunnel Data - AoA=" + str(AoA) + "°")
-            axs1[1].plot(xnew, spl_Cm(xnew), linestyle='dashed', color=(0, 0, 0), label="Wind Tunnel Data - AoA=" + str(AoA) + "°")
+            axs1[0].plot(xnew, spl_CN(xnew), linestyle='dashed', color=(0, 0, 0), label="Spline Line Interpolation - AoA=" + str(AoA) + "°")
+            axs1[1].plot(xnew, spl_Cm(xnew), linestyle='dashed', color=(0, 0, 0), label="Spline Line Interpolation - AoA=" + str(AoA) + "°")
 
         elif AoA == 16: 
             # plot doted dashed line 
-            axs1[0].plot(xnew, spl_CN(xnew), linestyle='dotted', color=(0, 0, 0), label="Wind Tunnel Data - AoA=" + str(AoA) + "°")
-            axs1[1].plot(xnew, spl_Cm(xnew), linestyle='dotted', color=(0, 0, 0), label="Wind Tunnel Data - AoA=" + str(AoA) + "°")
+            axs1[0].plot(xnew, spl_CN(xnew), linestyle='dotted', color=(0, 0, 0), label="Spline Line Interpolation - AoA=" + str(AoA) + "°")
+            axs1[1].plot(xnew, spl_Cm(xnew), linestyle='dotted', color=(0, 0, 0), label="Spline Line Interpolation - AoA=" + str(AoA) + "°")
 
         else: 
             print("ERROR! AoA value not found")
 
-        axs1[0].scatter(data_TUN_CN[:,0], data_TUN_CN[:,1], s=7, color=(0, 0, 0, 0.65))
-        axs1[1].scatter(data_TUN_Cm[:,0], data_TUN_Cm[:,1], s=7, color=(0, 0, 0, 0.65))
+        axs1[0].scatter(data_TUN_CN[:,0], data_TUN_CN[:,1], s=7, color=(0, 0, 0, 0.65), label="Wind Tunnel Data Points")
+        axs1[1].scatter(data_TUN_Cm[:,0], data_TUN_Cm[:,1], s=7, color=(0, 0, 0, 0.65), label="Wind Tunnel Data Points")
                
     return
 

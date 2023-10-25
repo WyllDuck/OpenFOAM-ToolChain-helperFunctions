@@ -81,7 +81,7 @@ def style_plot (fig, ax):
     # add legend
     #ax[0].legend(loc='upper right', fontsize=12)
     #ax[1].legend(loc='upper right', fontsize=12)
-    ax[2].legend(loc='upper right', fontsize=12)
+    #ax[2].legend(loc='upper right', fontsize=12)
 
     # subplot titles
     ax[0].set_title('Ma 2.3 - AoA 8 deg - PIMPLE', fontsize=14)
@@ -117,6 +117,13 @@ def style_plot (fig, ax):
     ax[0].set_ylabel('Relative Error [\%]', fontsize=14)
     ax[1].set_ylabel('Relative Error [\%]', fontsize=14)
     ax[2].set_ylabel('Relative Error [\%]', fontsize=14)
+
+    # add legend above figure
+    handles, labels = ax[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', ncol=4, fontsize=12)
+
+    # give more space between legend and plot
+    fig.subplots_adjust(bottom=0.2)
 
     return
 
