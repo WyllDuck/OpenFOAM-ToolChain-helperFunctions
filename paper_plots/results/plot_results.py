@@ -79,26 +79,26 @@ def main():
         # plot scatter with different shades of red for different AoA values
         if AoA == 0:
             axs2[0].scatter(data[:,0], data[:,2], label="PIMPLE", marker="o", color=(1, 0, 0))
-            axs2[0].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='-')
+            # axs2[0].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='-')
         elif AoA == 8:
             axs2[1].scatter(data[:,0], data[:,2], label="PIMPLE", marker="o", color=(1, 0, 0))
-            axs2[1].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='-')
+            # axs2[1].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='-')
         elif AoA == 16:
             axs2[2].scatter(data[:,0], data[:,2], label="PIMPLE", marker="o", color=(1, 0, 0))
-            axs2[2].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='-')
+            # axs2[2].plot(data[:,0], data[:,2], color=(1, 0, 0, ALPHA), linestyle='-')
         else: 
             print("ERROR! AoA value not found")
 
+        # CmPitch and CN
         if AoA == 0:
             continue
+        elif AoA == 8:
+            axs1[0].scatter(data[:,0], data[:,3], label="PIMPLE - AoA=" + str(AoA) + "°", marker="o", color=(1.0, 0, 0))
+            axs1[1].scatter(data[:,0], data[:,4], label="PIMPLE - AoA=" + str(AoA) + "°", marker="o", color=(1.0, 0, 0))
+        elif AoA == 16:
+            axs1[0].scatter(data[:,0], data[:,3], label="PIMPLE - AoA=" + str(AoA) + "°", marker="o", color=(0, 0, 1.0))
+            axs1[1].scatter(data[:,0], data[:,4], label="PIMPLE - AoA=" + str(AoA) + "°", marker="o", color=(0, 0, 1.0))
 
-        axs1[0].scatter(data[:,0], data[:,3], label="PIMPLE - AoA=" + str(AoA) + "°", marker="o", color=c_)
-        axs1[1].scatter(data[:,0], data[:,4], label="PIMPLE - AoA=" + str(AoA) + "°", marker="o", color=c_)
-
-        # add lines
-        c_ = tuple(list(c_) + [ALPHA])
-        axs1[0].plot(data[:,0], data[:,3], color=c_, linestyle='-')
-        axs1[1].plot(data[:,0], data[:,4], color=c_, linestyle='-')
 
     solver = "CENTRAL"
     res_CENTRAL = df_res[df_res['SOLVER'] == solver].to_numpy()
@@ -109,29 +109,29 @@ def main():
         data = np.array([i for i in res_CENTRAL if i[1] == AoA])
 
         # plot scatter with different shades of red for different AoA values
+
+        # CA
         if AoA == 0:
-            axs2[0].scatter(data[:,0], data[:,2], label="CENTRAL", marker="x", color=(0, 0, 1))
-            axs2[0].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='-')
+            axs2[0].scatter(data[:,0], data[:,2], label="CENTRAL", marker="x", color=(0, 0, 0.7), s=100, linewidths=1.5)
+            # axs2[0].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='-')
         elif AoA == 8:
-            axs2[1].scatter(data[:,0], data[:,2], label="CENTRAL", marker="x", color=(0, 0, 1))
-            axs2[1].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='-')
+            axs2[1].scatter(data[:,0], data[:,2], label="CENTRAL", marker="x", color=(0, 0, 0.7), s=100, linewidths=1.5)
+            # axs2[1].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='-')
         elif AoA == 16:
-            axs2[2].scatter(data[:,0], data[:,2], label="CENTRAL", marker="x", color=(0, 0, 1))
-            axs2[2].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='-')
+            axs2[2].scatter(data[:,0], data[:,2], label="CENTRAL", marker="x", color=(0, 0, 0.7), s=100, linewidths=1.5)
+            # axs2[2].plot(data[:,0], data[:,2], color=(0, 0, 1, ALPHA), linestyle='-')
         else: 
             print("ERROR! AoA value not found")
 
+        # CmPitch and CN
         if AoA == 0:
             continue
-
-        # plot scatter with different shades of blue for different AoA values
-        axs1[0].scatter(data[:,0], data[:,3], label="CENTRAL - AoA=" + str(AoA) + "°", marker="x", color=c_)
-        axs1[1].scatter(data[:,0], data[:,4], label="CENTRAL - AoA=" + str(AoA) + "°", marker="x", color=c_)
-        
-        # add lines
-        c_ = tuple(list(c_) + [ALPHA])
-        axs1[0].plot(data[:,0], data[:,3], color=c_, linestyle='-')
-        axs1[1].plot(data[:,0], data[:,4], color=c_, linestyle='-')
+        elif AoA == 8:
+            axs1[0].scatter(data[:,0], data[:,3], label="CENTRAL - AoA=" + str(AoA) + "°", marker="x", color=(0.7, 0, 0), s=100, linewidths=1.5)
+            axs1[1].scatter(data[:,0], data[:,4], label="CENTRAL - AoA=" + str(AoA) + "°", marker="x", color=(0.7, 0, 0), s=100, linewidths=1.5)
+        elif AoA == 16:
+            axs1[0].scatter(data[:,0], data[:,3], label="CENTRAL - AoA=" + str(AoA) + "°", marker="x", color=(0, 0, 0.7), s=100, linewidths=1.5)
+            axs1[1].scatter(data[:,0], data[:,4], label="CENTRAL - AoA=" + str(AoA) + "°", marker="x", color=(0, 0, 0.7), s=100, linewidths=1.5)
 
     plot_TUN_data(axs1,axs2)
     

@@ -21,29 +21,29 @@ SELECTED_AOA        = [0, 8, 16]
 GENERATE = {
     # Solvers
     "rhoPimpleFoam": 1, 
-    "rhoCentralFoam": 1, 
+    "rhoCentralFoam": 0, 
     "rhoSimpleFoam": 0, 
 
     # Meshes
     "R1": 1,
-    "R2": 0, 
-    "R3": 0, 
-    "R4": 0, 
+    "R2": 1, 
+    "R3": 1, 
+    "R4": 1, 
     "R5": 1, 
     "R6": 1, 
 
     # Mach Numbers
     "Ma" : {0.6: 1, 
-            1.0: 1, 
-            1.5: 1, 
-            2.3: 1, 
-            4.63: 1
+            1.0: 0, 
+            1.5: 0, 
+            2.3: 0, 
+            4.63: 0
     }, 
 
     # Angles of Attack
-    "AoA": {0: 1, 
+    "AoA": {0: 0, 
             8: 1, 
-            16: 1
+            16: 0
     }
 }
 
@@ -451,8 +451,8 @@ def rhoPimpleFoam_specific_R2 (config_, mapFields=None):
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
-    config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 50
+    config_["coeffs_variation"] = [1e-3, 1e-3, 1e-2]
+    config_["coeffs_range"]     = [300, 300, 300]
 
     config_["wallModelnut"]     = True
     config_["wallModelk"]       = True
@@ -470,8 +470,8 @@ def rhoPimpleFoam_specific_R3 (config_, mapFields=None):
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
-    config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 50
+    config_["coeffs_variation"] = [1e-3, 1e-3, 1e-2]
+    config_["coeffs_range"]     = [200, 200, 200]
     
     config_["wallModelnut"]     = True
     config_["wallModelk"]       = True
@@ -489,8 +489,8 @@ def rhoPimpleFoam_specific_R4 (config_, mapFields=None):
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
-    config_["coeffs_variation"] = 1e-3
-    config_["coeffs_range"]     = 50
+    config_["coeffs_variation"] = [1e-3, 1e-3, 1e-2]
+    config_["coeffs_range"]     = [150, 150, 150]
     
     config_["wallModelnut"]     = True
     config_["wallModelk"]       = True
@@ -503,13 +503,13 @@ def rhoPimpleFoam_specific_R5 (config_, mapFields=None):
     config_["mesh_file"] = SELECTED_MESHES_ADR.format(SELECTED_MESHES[4])
 
     config_["minIter"] = 1000
-    config_["final_Co"] = 0.4
+    config_["final_Co"] = 0.8
 
     if mapFields:
         config_["map_file"] = SAVE_DIR + "/" + mapFields
 
     config_["coeffs_variation"] = [1e-3, 1e-3, 5e-3]
-    config_["coeffs_range"]     = [50, 50, 50]
+    config_["coeffs_range"]     = [80, 80, 80]
     
     config_["wallModelnut"]     = True
     config_["wallModelk"]       = True
