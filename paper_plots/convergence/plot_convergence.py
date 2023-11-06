@@ -11,7 +11,7 @@ plt.rcParams["text.usetex"] = False
 
 import os
 GLOBAL_DIR = os.path.dirname(os.path.abspath(__file__))
-NAMES_SELECTED = ["Ma 2.3 - AoA 8 - PIMPLE", "Ma 2.3 - AoA 16 - CENTRAL", "Ma 4.63 - AoA 16 - CENTRAL"]
+NAMES_SELECTED = ["Ma 2.3 - AoA 8 - PIMPLE", "Ma 2.3 - AoA 16 - CENTRAL", "Ma 0.6 - AoA 8 - PIMPLE"]
 
 def main ():
 

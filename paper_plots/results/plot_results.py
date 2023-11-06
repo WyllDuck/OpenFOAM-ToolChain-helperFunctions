@@ -21,7 +21,7 @@ GLOBAL_DIR = os.path.dirname(os.path.abspath(__file__))
 WORKING_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # simulation results - wind tunnel data too
-df_res = pd.read_csv(WORKING_DIR + "/" + 'results.csv')
+df_res = pd.read_csv(WORKING_DIR + "/" + 'results.csv', sep='\t')
 
 # wind tunnel data
 df_tun_CA = pd.read_csv(WORKING_DIR + "/../../" + 'CA_coefficients.csv')
@@ -60,8 +60,8 @@ def main():
     fig1, axs1 = plt.subplots(1, 2, figsize=(10, 5))
     fig2, axs2 = plt.subplots(1, 3, figsize=(15, 5))
 
-    solver = "PIMPLE"
-    res_PIMPLE = df_res[df_res['SOLVER'] == solver].to_numpy()
+    solver = "rhoPimpleFoam"
+    res_PIMPLE = df_res[df_res['Solver'] == solver].to_numpy()
     res_PIMPLE = res_PIMPLE[:,1:].astype(float)
 
     # group 1 colors (list of tuples) --> None element, orange, red
@@ -100,8 +100,8 @@ def main():
             axs1[1].scatter(data[:,0], data[:,4], label="PIMPLE - AoA=" + str(AoA) + "°", marker="o", color=(0, 0, 1.0))
 
 
-    solver = "CENTRAL"
-    res_CENTRAL = df_res[df_res['SOLVER'] == solver].to_numpy()
+    solver = "rhoCentralFoam"
+    res_CENTRAL = df_res[df_res['Solver'] == solver].to_numpy()
     res_CENTRAL = res_CENTRAL[:,1:].astype(float)
 
     for AoA in (0, 8, 16):

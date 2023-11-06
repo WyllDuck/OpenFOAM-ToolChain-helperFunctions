@@ -8,7 +8,7 @@ plt.rcParams["text.usetex"] = False
 
 import os
 GLOBAL_DIR = os.path.dirname(os.path.abspath(__file__))
-NAMES_SELECTED = ["Ma 2.3 - AoA 8 - PIMPLE", "Ma 2.3 - AoA 16 - CENTRAL", "Ma 4.63 - AoA 16 - CENTRAL"]
+NAMES_SELECTED = ["Ma 2.3 - AoA 8 - PIMPLE", "Ma 2.3 - AoA 16 - CENTRAL", "Ma 0.6 - AoA 8 - PIMPLE"]
 
 def main ():
 
@@ -121,6 +121,11 @@ def style_plot (fig, ax):
 
     # give more space between legend and plot
     fig.subplots_adjust(bottom=0.25)
+
+    # same y axis scale for all subplots
+    ax[0].set_ylim(bottom=1e-12, top=1e-3)
+    ax[1].set_ylim(bottom=1e-12, top=1e-3)
+    ax[2].set_ylim(bottom=1e-12, top=1e-3)
 
     return
 
