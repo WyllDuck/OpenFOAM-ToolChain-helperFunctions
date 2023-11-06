@@ -1,0 +1,5 @@
+convergence_1,Ma 2.3 - AoA 8 - PIMPLE
+convergence_2,Ma 2.3 - AoA 16 - CENTRAL
+convergence_3,Ma 4.63 - AoA 16 - CENTRAL
+convergence_5,Ma 1.5 - AoA 0 - PIMPLE
+convergence_4,Ma 0.6 - AoA 8 - PIMPLE

@@ -1,0 +1,6 @@
+scipy
+matplotlib
+numpy
+pandas
+opencv-python
+jinja2-cli
