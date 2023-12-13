@@ -4,7 +4,7 @@ __by Félix Marti Valverde__
 This repository is part of a greater project found in the main repository _OpenFOAM ToolChain for Rocket Aerodynamic Analysis_ (https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis). The functions contained here are miscellaneous calculations and or data extraction scripts to validate the CFD methodology followed in the main repository.
 
 <p float="left">
-  <img src="M0.8_CA-ALPHA_subsonic_transonic_page-0001.png" alt="Image 2" width="350" />
+  <img src="M0.8_CA-ALPHA_subsonic_transonic_page-0001.png" alt="Image 2" width="400" />
   <img src="M0.8_CA-ALPHA.png" alt="Image 1" width="350" />
 </p>
 
@@ -37,25 +37,25 @@ python3 -m pip install -r requirements.txt
 ### SCRIPTS
 
 <ul>
-  <li><i>picture2coefficients.py</i>: Uses spline lines to extrapolate the data from the <i>TXT</i> in <i>points</i> to cover all relevant angles of attack. Additionally, a folder named <i>check_images</i> is generated containing 2 images per graph. One overlaying the <i>TXT</i> information to the original image in <i>graphs</i> to check for user input mistakes, and another image with the generated spline data points.</li>  
+  <li><b>picture2coefficients.py</b>: Uses spline lines to extrapolate the data from the <i>TXT</i> in <i>points</i> to cover all relevant angles of attack. Additionally, a folder named <i>check_images</i> is generated containing 2 images per graph. One overlaying the <i>TXT</i> information to the original image in <i>graphs</i> to check for user input mistakes, and another image with the generated spline data points.</li>  
 
-  <li><i>get_boundary_conditions.py</i>: Calculates the different boundary conditions required for each Mach Number to keep a constant Reynolds number.</li>
+  <li><b>get_boundary_conditions.py</b>: Calculates the different boundary conditions required for each Mach Number to keep a constant Reynolds number.</li>
   
-  <li><i>atmosphere.py</i>: Model of the atmosphere used to calculate inlet conditions in the <i>get_boundary_conditions.py</i> script</li>
+  <li><b>atmosphere.py</b>: Model of the atmosphere used to calculate inlet conditions in the <i>get_boundary_conditions.py</i> script</li>
   
-  <li><i>get_configuration_files.py</i>: Configurable script assesses the generation of large amounts of configuration files for each CFD simulation. For more information on the structure and the usage of these configuration files please visit the main repository: https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis </li>
+  <li><b>get_configuration_files.py</b>: Configurable script assesses the generation of large amounts of configuration files for each CFD simulation. For more information on the structure and the usage of these configuration files please visit the main repository: https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis </li>
 </ul>
 
 ### CSV FILES
 
 <ul>
-  <li><i>CA_coefficients.csv</i>: Axial Aerodynamic Coefficient vs. Angle of Attack and Mach Number</li>
+  <li><b>CA_coefficients.csv</b>: Axial Aerodynamic Coefficient vs. Angle of Attack and Mach Number</li>
   
-  <li><i>CN_coefficients.csv</i>: Normal Aerodynamic Coefficient vs. Angle of Attack and Mach Number</li>
+  <li><b>CN_coefficients.csv</b>: Normal Aerodynamic Coefficient vs. Angle of Attack and Mach Number</li>
   
-  <li><i>Cm_coefficients.csv</i>: Pitch Moment Aerodynamic Coefficient vs. Angle of Attack and Mach Number</li>
+  <li><b>Cm_coefficients.csv</b>: Pitch Moment Aerodynamic Coefficient vs. Angle of Attack and Mach Number</li>
   
-  <li><i>boundary_conditions.csv</i>: All relevant inlet boundary conditions for each Mach number</li>
+  <li><b>boundary_conditions.csv</b>: All relevant inlet boundary conditions for each Mach number</li>
   
 </ul>
 
