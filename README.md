@@ -7,6 +7,11 @@ This repository is part of a greater project found in the main repository _OpenF
 
 ## SETUP
 
+Install all the requiered python libraries 
+```bash
+python3 -m pip install -r requirements.txt
+```
+
 ## CONTENT
 
 <ul>
@@ -24,14 +29,24 @@ This repository is part of a greater project found in the main repository _OpenF
 
   <li><b><i>PYTHON_SCRIPTS</i></b>
     <ul>
-      <li><i>picture2coefficients.py</i>: Looks in the <i>points</i> folder and proceeds to change the reference frame from pixel position in image to the described reference frame based on the respective graph in <i>graphs</i>. Then using the new data points available it goes on to feed it to a spline line to interpolate the remaining data points. Finally, the resulting data in saved in <i>CSV</i> files. See <i>CSV_FILES</i> for more information on the files generated. Additionally, a folder named <i>check_images</i> 2 images per graph, one overlaying the <i>TXT</i> information over the original image in <i>graphs</i> and another image with the generated spline data points.</li>
-      <li><i>get_boundary_conditions.py</i>: </li>
-      <li><i>get_boundary_conditions.py</i></li>
-      <li><i>atmosphere.py</i></li>
+      <li><i>picture2coefficients.py</i>: Looks in the <i>points</i> folder and proceeds to change the reference frame from pixel position in image to the described reference frame based on the respective graph in <i>graphs</i>. Then using the new data points available it goes on to feed it to a spline line to interpolate the remaining data points. Finally, the resulting data in saved in <i>CSV</i> files. See <i>CSV_FILES</i> for more information on the files generated. Additionally, a folder named <i>check_images</i> 2 images per graph, one overlaying the <i>TXT</i> information over the original image in <i>graphs</i> and another image with the generated spline data points.</li>  
+      <li><i>get_boundary_conditions.py</i>: Calculates the different boundary conditions requiered for each Mach Number to keep a constant Reynolds number.</li>
+      <li><i>atmosphere.py</i>: Model of the atmosphere used to calculate inlet conditions in the <i>get_boundary_conditions.py</i> script</li>
+      <li><i>get_configuration_files.py</i>: Configurable script assess in the generation of large amounts of configuration files for each CFD simulation. For more information on the structure and the usage of these configuration files please visit the main repository: https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis </li>
     </ul>
   </li>
 
   <li><b><i>CSV_FILES</i></b></li>
+  <ul>
+    <li><i>CA_coefficients.csv</i>: Axial Aerodynamic Coefficient vs. Angle of Attack and Mach Number</li>
+    
+    <li><i>CN_coefficients.csv</i>: Normal Aerodynamic Coefficient vs. Angle of Attack and Mach Number</li>
+    
+    <li><i>Cm_coefficients.csv</i>: Pitch Moment Aerodynamic Coefficient vs. Angle of Attack and Mach Number</li>
+    
+    <li><i>boundary_conditions.csv</i>: All relevant inlet boundary conditions for each Mach number</li>
+    
+  </ul>
 </ul>
 
 ## SOURCES
