@@ -1,7 +1,7 @@
 # Helper Functions - <a href="https://www.example.com/my great page">OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis</a>
 __by Félix Marti Valverde__
 
-This repository is part of a greater project found in the main repository _OpenFOAM ToolChain for Rocket Aerodynamic Analysis_ (https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis). The functions contained here are miscellaneous calculations and or data extraction scripts to validate the CFD methodology followed in the main repository.
+This repository is part of a greater project found in the main repository _OpenFOAM ToolChain for Rocket Aerodynamic Analysis_ (https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis). The functions contained here are miscellaneous calculations and data extraction scripts to validate the CFD methodology followed in the main repository.
 
 <p float="left">
   <img src="M0.8_CA-ALPHA_subsonic_transonic_page-0001.png" alt="Image 2" width="400" />
@@ -9,6 +9,10 @@ This repository is part of a greater project found in the main repository _OpenF
 </p>
 
 ### links
+
+SIMULATIONS FILES: https://1drv.ms/f/s!AhNN3_xNz6xdhe1IEGJ-niuFxb3V3g?e=uLhchQ
+REPORT: https://1drv.ms/b/s!AhNN3_xNz6xdhex7se7BjiaeyGrojg?e=m3ClFa
+CAD FILES: https://1drv.ms/f/s!AhNN3_xNz6xdhK0CDDJZs5zly81P_w?e=NSELu2
 
 ## SETUP
 
@@ -24,26 +28,26 @@ python3 -m pip install -r requirements.txt
 <ul>
   <li><b>data</b>: <i>PDFs</i> containing only the relevant wind-tunnel graphs used to validate the CFD results. Data comes from sources [1][2].</li>
   
-  <li><b>graph</b>: All the pages contained in the pdf from <i>data</i> are converted to <i>JPEG</i> images in order to procced to data digitalization using python scripts.</li>
+  <li><b>graph</b>: All the pages contained in the pdf from <i>data</i> are converted to <i>JPEG</i> images, to then proceed to data digitalization using Python scripts.</li>
   
-  <li><b>paper_plots</b>: This folder <b>only contains Python scripts used to generate the plots in the report</b>. Click on link above to access the report.</li>
+  <li><b>paper_plots</b>: This folder <b>only contains Python scripts used to generate the plots in the report</b>. Click on the link above to access the report.</li>
   
-  <li><b>paraview_states_plots</b>: This folder <b>contains the Paraview state files used to postprocess CFD results in the report</b> in addition to the raw images added in the report. Click on link above to access the report.</li>
+  <li><b>paraview_states_plots</b>: This folder <b>contains the Paraview state files used to post-process CFD results in the report</b> in addition to the raw images added in the report. Click on the link above to access the report.</li>
   
-  <li><b>points</b>: Contains a set of <b>TXT</b> with information to extract each image in <b>graphs</b> to valuable aerodynamic coefficients</li>
+  <li><b>points</b>: Contains a set of <b>TXT</b> files with information to extract each plot with the aerodynamic coefficient from the image in <b>graphs</b>.</li>
 
 </ul>
 
 ### SCRIPTS
 
 <ul>
-  <li><b>picture2coefficients.py</b>: Uses spline lines to extrapolate the data from the <i>TXT</i> in <i>points</i> to cover all relevant angles of attack. Additionally, a folder named <i>check_images</i> is generated containing 2 images per graph. One overlaying the <i>TXT</i> information to the original image in <i>graphs</i> to check for user input mistakes, and another image with the generated spline data points.</li>  
+  <li><b>picture2coefficients.py</b>: Uses spline lines to extrapolate the data from the <i>TXT</i> file in <i>points</i> folder, thus covering all relevant angles of attack. Additionally, a folder named <i>check_images</i> is generated containing 2 images per graph. One overlaying the <i>TXT</i> information to the original image in <i>graphs</i> to check for user input mistakes, and another image with the generated spline data points.</li>  
 
   <li><b>get_boundary_conditions.py</b>: Calculates the different boundary conditions required for each Mach Number to keep a constant Reynolds number.</li>
   
   <li><b>atmosphere.py</b>: Model of the atmosphere used to calculate inlet conditions in the <i>get_boundary_conditions.py</i> script</li>
   
-  <li><b>get_configuration_files.py</b>: Configurable script assesses the generation of large amounts of configuration files for each CFD simulation. For more information on the structure and the usage of these configuration files please visit the main repository: https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis </li>
+  <li><b>get_configuration_files.py</b>: Configurable script that helps the user during the generation of large amounts of configuration files for each CFD simulation. For more information on the structure and the usage of these configuration files please visit the main repository: https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis </li>
 </ul>
 
 ### CSV FILES
