@@ -4,23 +4,45 @@ __by Félix Marti Valverde__
 This repository is part of a greater project found in the main repository _OpenFOAM ToolChain for Rocket Aerodynamic Analysis_ (https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis). The functions contained here are miscellaneous calculations and data extraction scripts to validate the CFD methodology followed in the main repository.
 
 <p float="left">
-  <img src="M0.8_CA-ALPHA_subsonic_transonic_page-0001.png" alt="Image 2" width="400" />
-  <img src="M0.8_CA-ALPHA.png" alt="Image 1" width="350" />
+  <img src="documentation/M0.8_CA-ALPHA_subsonic_transonic_page-0001.png" alt="Image 2" width="400" />
+  <img src="documentation/M0.8_CA-ALPHA.png" alt="Image 1" width="350" />
 </p>
 
 ### links
 
-SIMULATIONS FILES: https://1drv.ms/f/s!AhNN3_xNz6xdhe1IEGJ-niuFxb3V3g?e=uLhchQ
+* __SIMULATIONS FILES:__ https://1drv.ms/f/s!AhNN3_xNz6xdhe1IEGJ-niuFxb3V3g?e=uLhchQ
 
-REPORT: https://1drv.ms/b/s!AhNN3_xNz6xdhex7se7BjiaeyGrojg?e=m3ClFa
+* __REPORT:__ https://1drv.ms/b/s!AhNN3_xNz6xdhex7se7BjiaeyGrojg?e=m3ClFa
 
-CAD FILES: https://1drv.ms/f/s!AhNN3_xNz6xdhK0CDDJZs5zly81P_w?e=NSELu2
+* __CAD FILES:__ https://1drv.ms/f/s!AhNN3_xNz6xdhK0CDDJZs5zly81P_w?e=NSELu2
 
 ## SETUP
 
 Install all the requiered python libraries 
 ```bash
 python3 -m pip install -r requirements.txt
+```
+
+## EXECUTION
+
+To obtain the configuration files to template the OpenFOAM workspace all the data must be generated from scratch. Follow these steps to create it:
+
+1. Calculate the boundary conditions for the simulations
+
+```bash
+python3 get_boundary_conditions.py
+```
+
+2. Extract the aerodynamic coefficients from the graphs
+
+```bash
+python3 picture2coefficients.py
+```
+
+3. Generate the templating files. This Python script is configurable, edit the parameter inside the script to generate the _JSON_ files you require.
+
+```bash
+python3 get_configuration_files.py
 ```
 
 ## CONTENT
@@ -49,7 +71,7 @@ python3 -m pip install -r requirements.txt
   
   <li><b>atmosphere.py</b>: Model of the atmosphere used to calculate inlet conditions in the <i>get_boundary_conditions.py</i> script</li>
   
-  <li><b>get_configuration_files.py</b>: Configurable script that helps the user during the generation of large amounts of configuration files for each CFD simulation. For more information on the structure and the usage of these configuration files please visit the main repository: https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis </li>
+  <li><b>get_configuration_files.py</b>: Configurable script that helps the user during the generation of large amounts of configuration files for each CFD simulation. For more information on the structure and the usage of these configuration files please visit the main repository: <a href=https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis>https://github.com/WyllDuck/OpenFOAM-ToolChain-for-Rocket-Aerodynamic-Analysis</a> </li>
 </ul>
 
 ### CSV FILES
